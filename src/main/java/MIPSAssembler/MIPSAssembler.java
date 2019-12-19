@@ -9,25 +9,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class MIPSAssembler {
-    
+
     public static final String lookUpTableFileName = "instructionTable.txt";
 
-    public static final long firstMIPSMemoryLocation = 0x80001000L; // given in PDF
-    
+    public static final long firstMIPSMemoryLocation = 0x8000100eL; // given in PDF
+
     public static Map<String, Long> instructionTable = new HashMap<>();
 
     public static Scanner consoleInput = new Scanner(System.in);
     
-    public static void fillInstructionTable() throws FileNotFoundException
+    // TEST
+    public static void printInstructionTable()
     {
+       for (Map.Entry<String, Long> me:instructionTable.entrySet()) 
+       { 
+           System.out.print(me.getKey()+":"); 
+           System.out.println("0x" + Long.toHexString(me.getValue())); 
+       }
+    }
+
+    public static void fillInstructionTable() throws FileNotFoundException {
         Scanner lookUpTableFile = new Scanner(new File(lookUpTableFileName));
+
+        while (lookUpTableFile.hasNextLine()) {
+            String nextLine = lookUpTableFile.nextLine();
+
+            if (!nextLine.startsWith("#")) {
+                String[] theInstruction = nextLine.split(" ");
+                
+                instructionTable.put(theInstruction[0], Long.decode(theInstruction[1]));
+            }
+        }
         
-        while (lookUpTableFile.hasNextLine())
-            instructionTable.put(lookUpTableFile.next(), lookUpTableFile.nextLong());
+        lookUpTableFile.close();
     }
 
     public static long assemble(String theInstruction) {
@@ -40,16 +56,17 @@ public class MIPSAssembler {
         String inputFileName, outputFileName;
         Scanner inputFile;
         FileWriter outputFile;
-        
+
         List<String> instructionsToAssemble = new ArrayList<>();
 
         while (true) {
             System.out.println("");
             System.out.print("Enter name of source file: ");
             inputFileName = consoleInput.nextLine();
-            if (!inputFileName.contains(".src"))
+            if (!inputFileName.contains(".src")) {
                 inputFileName += ".src";
-            
+            }
+
             try {
                 inputFile = new Scanner(new File(inputFileName));
                 break;
@@ -57,14 +74,14 @@ public class MIPSAssembler {
                 System.out.println("File not found!");
             }
         }
-        
-        while (true)
-        {
+
+        while (true) {
             System.out.print("Enter name of output file: ");
             outputFileName = consoleInput.nextLine();
-            if (!outputFileName.contains(".obj"))
+            if (!outputFileName.contains(".obj")) {
                 outputFileName += ".obj";
-            
+            }
+
             try {
                 outputFile = new FileWriter(outputFileName);
                 break;
@@ -72,12 +89,12 @@ public class MIPSAssembler {
                 System.out.println(outputFileName + "could not created!");
             }
         }
-        
-        while (inputFile.hasNextLine())
+
+        while (inputFile.hasNextLine()) {
             instructionsToAssemble.add(inputFile.nextLine());
-        
+        }
+
         // TEST
-        
         /*
         while (inputFile.hasNextLine())
             try {
@@ -93,7 +110,6 @@ public class MIPSAssembler {
         } catch (IOException ex) {
             System.out.println("Could not write to file " + outputFileName);
         }*/
-        
         System.exit(0);
     }
 
@@ -116,13 +132,15 @@ public class MIPSAssembler {
     public static void main(String[] args) {
         //System.out.println("First MIPS Memory Location is 0x" + Long.toHexString(firstMIPSMemoryLocation));
         String answer;
-        
+
         try {
             fillInstructionTable();
         } catch (FileNotFoundException ex) {
             System.out.println(lookUpTableFileName + " is not found!");
             System.exit(1);
         }
+        
+        printInstructionTable();
 
         while (true) {
             System.out.println("");
