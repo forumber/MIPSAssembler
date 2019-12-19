@@ -12,42 +12,54 @@ import java.util.Scanner;
 
 public class MIPSAssembler {
 
-    public static final String lookUpTableFileName = "instructionTable.txt";
-
-    public static final long firstMIPSMemoryLocation = 0x8000100eL; // given in PDF
-
-    public static Map<String, Long> instructionTable = new HashMap<>();
+    public static List<Instruction> instructionTable = new ArrayList<>();
 
     public static Scanner consoleInput = new Scanner(System.in);
-    
+
     // TEST
-    public static void printInstructionTable()
-    {
-       for (Map.Entry<String, Long> me:instructionTable.entrySet()) 
-       { 
-           System.out.print(me.getKey()+":"); 
-           System.out.println("0x" + Long.toHexString(me.getValue())); 
-       }
+    public static void printInstructionTable() {
+        for (Instruction i : instructionTable) {
+            System.out.println(i.instructionType + " " + i.instructionName
+                    + " " + Long.toHexString(i.theCode));
+        }
     }
 
     public static void fillInstructionTable() throws FileNotFoundException {
-        Scanner lookUpTableFile = new Scanner(new File(lookUpTableFileName));
+        Scanner lookUpTableFile = new Scanner(new File(Constants.lookUpTableFileName));
 
         while (lookUpTableFile.hasNextLine()) {
             String nextLine = lookUpTableFile.nextLine();
 
             if (!nextLine.startsWith("#")) {
                 String[] theInstruction = nextLine.split(" ");
-                
-                instructionTable.put(theInstruction[0], Long.decode(theInstruction[1]));
+
+                instructionTable.add(new Instruction(theInstruction[0],
+                        theInstruction[1], Long.decode(theInstruction[2])));
             }
         }
-        
+
         lookUpTableFile.close();
     }
 
-    public static long assemble(String theInstruction) {
-        return firstMIPSMemoryLocation; // test
+    public static long assemble(String instructionToDecode) {
+        Instruction instructionToDecodeType = null;
+        
+        String[] instrParts = instructionToDecode.split(" ");
+        for(Instruction i: instructionTable){
+            if(i.instructionName.equals(instrParts[0]))
+                instructionToDecodeType = i;
+        }
+        if(instructionToDecodeType == null){
+            System.err.println("Instruction " + instrParts[0] + " is not a"
+                    + "valid instruction!");
+        }
+        
+        if(!instructionToDecodeType.instructionType.equals(Constants.TYPE_J)){
+           String[] instrOperands = instrParts[1].split(",");
+           
+        }
+        
+        return Constants.firstMIPSMemoryLocation; // test
     }
 
     public static void batchMode() {
@@ -136,10 +148,10 @@ public class MIPSAssembler {
         try {
             fillInstructionTable();
         } catch (FileNotFoundException ex) {
-            System.out.println(lookUpTableFileName + " is not found!");
+            System.out.println(Constants.lookUpTableFileName + " is not found!");
             System.exit(1);
         }
-        
+
         printInstructionTable();
 
         while (true) {
