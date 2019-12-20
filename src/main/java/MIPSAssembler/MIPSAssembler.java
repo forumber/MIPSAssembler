@@ -12,23 +12,34 @@ import java.util.Scanner;
 
 public class MIPSAssembler {
 
-    public static List<Instruction> lookUpTable = new ArrayList<>();
+    public static List<InstructionList> lookUpTable = new ArrayList<>();
 
     public static Scanner consoleInput = new Scanner(System.in);
 
     // TEST
     public static void printInstructionTable() {
-        for (Instruction i : lookUpTable) {
-            System.out.println(i.instructionType + " " + i.instructionName
-                    + " " + Long.toHexString(i.theCode));
+        for (InstructionList i : lookUpTable) {
+            System.out.println(i.instructionType + " type instructions;");
+            i.instruction.entrySet().forEach(entry -> {
+                System.out.println(entry.getKey() + " " + entry.getValue());
+            });
+            System.out.println("");
         }
     }
 
     public static void fillLookUpTable() throws FileNotFoundException {
         Scanner lookUpTableFile = new Scanner(new File(Constants.lookUpTableFileName));
         int lineCounter = 0;
+        
+        lookUpTable.add(new InstructionList(Constants.TYPE_I));
+        lookUpTable.add(new InstructionList(Constants.TYPE_J));
+        lookUpTable.add(new InstructionList(Constants.TYPE_R));
+        lookUpTable.add(new InstructionList(Constants.TYPE_MEMORY));
+        lookUpTable.add(new InstructionList(Constants.TYPE_REGISTER));
 
         while (lookUpTableFile.hasNextLine()) {
+            boolean found = false;
+            
             String nextLine = lookUpTableFile.nextLine();
             lineCounter++;
             
@@ -36,13 +47,14 @@ public class MIPSAssembler {
             if (!(nextLine.startsWith("#") || nextLine.isEmpty())) {
                 String[] theInstruction = nextLine.split(" ");
                 
-                if (theInstruction[0].equals(Constants.TYPE_I) || theInstruction[0].equals(Constants.TYPE_R) || 
-                        theInstruction[0].equals(Constants.TYPE_J) || theInstruction[0].equals(Constants.TYPE_MEMORY) || 
-                        theInstruction[0].equals(Constants.TYPE_REGISTER)) 
-                {
-                    lookUpTable.add(new Instruction(theInstruction[0],
-                        theInstruction[1], Long.decode(theInstruction[2])));
-                } else
+                for (InstructionList i: lookUpTable)
+                    if (theInstruction[0].equals(i.instructionType))
+                    {
+                        found = true;
+                        i.add(theInstruction[1], theInstruction[2]);
+                    }
+                
+                if (!found)
                 {
                     System.err.println("");
                     System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
@@ -57,22 +69,26 @@ public class MIPSAssembler {
     }
 
     public static long assemble(String instructionToDecode) {
-        Instruction instructionToDecodeType = null;
+        String instructionToDecodeType = "";
+        String instructionOpCode = "";
+        
         
         String[] instrParts = instructionToDecode.split(" ");
-        for(Instruction i: lookUpTable){
-            if(i.instructionName.equals(instrParts[0]))
-                instructionToDecodeType = i;
+        for(InstructionList i: lookUpTable){
+            if(i.instruction.containsKey(instrParts[0]))
+            {
+                instructionToDecodeType = i.instructionType;
+                instructionOpCode = i.instruction.get(instrParts[0]);
+            }
         }
         
-        if(instructionToDecodeType == null){
+        if(instructionToDecodeType.isEmpty()){
             System.err.println("Instruction " + instrParts[0] + " is not a"
                     + "valid instruction!");
         }
         
-        if(!instructionToDecodeType.instructionType.equals(Constants.TYPE_J)){
+        if(!instructionToDecodeType.equals(Constants.TYPE_J)){
            String[] instrOperands = instrParts[1].split(", ");
-           
         }
         
         return Constants.firstMIPSMemoryLocation; // test
@@ -123,7 +139,6 @@ public class MIPSAssembler {
         }
 
         // TEST
-        /*
         while (inputFile.hasNextLine())
             try {
                 outputFile.write(inputFile.nextLine());
@@ -137,7 +152,7 @@ public class MIPSAssembler {
             System.out.println("File write operation has been completed successfully!");
         } catch (IOException ex) {
             System.out.println("Could not write to file " + outputFileName);
-        }*/
+        }
         System.exit(0);
     }
 
