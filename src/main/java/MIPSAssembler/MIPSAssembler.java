@@ -1,3 +1,5 @@
+// Test at https://csfieldguide.org.nz/en/interactives/mips-assembler/
+
 package MIPSAssembler;
 
 import java.io.File;
@@ -5,36 +7,49 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 public class MIPSAssembler {
 
-    public static List<Instruction> instructionTable = new ArrayList<>();
+    public static List<Instruction> lookUpTable = new ArrayList<>();
 
     public static Scanner consoleInput = new Scanner(System.in);
 
     // TEST
     public static void printInstructionTable() {
-        for (Instruction i : instructionTable) {
+        for (Instruction i : lookUpTable) {
             System.out.println(i.instructionType + " " + i.instructionName
                     + " " + Long.toHexString(i.theCode));
         }
     }
 
-    public static void fillInstructionTable() throws FileNotFoundException {
+    public static void fillLookUpTable() throws FileNotFoundException {
         Scanner lookUpTableFile = new Scanner(new File(Constants.lookUpTableFileName));
+        int lineCounter = 0;
 
         while (lookUpTableFile.hasNextLine()) {
             String nextLine = lookUpTableFile.nextLine();
-
-            if (!nextLine.startsWith("#")) {
+            lineCounter++;
+            
+            // TODO: Change theInstruction variable name
+            if (!(nextLine.startsWith("#") || nextLine.isEmpty())) {
                 String[] theInstruction = nextLine.split(" ");
-
-                instructionTable.add(new Instruction(theInstruction[0],
+                
+                if (theInstruction[0].equals(Constants.TYPE_I) || theInstruction[0].equals(Constants.TYPE_R) || 
+                        theInstruction[0].equals(Constants.TYPE_J) || theInstruction[0].equals(Constants.TYPE_MEMORY) || 
+                        theInstruction[0].equals(Constants.TYPE_REGISTER)) 
+                {
+                    lookUpTable.add(new Instruction(theInstruction[0],
                         theInstruction[1], Long.decode(theInstruction[2])));
+                } else
+                {
+                    System.err.println("");
+                    System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
+                    System.err.println("Line " + lineCounter + ": " + theInstruction[0] + " is not a valid instruction type!");
+                    System.exit(1);
+                }
+
             }
         }
 
@@ -45,17 +60,18 @@ public class MIPSAssembler {
         Instruction instructionToDecodeType = null;
         
         String[] instrParts = instructionToDecode.split(" ");
-        for(Instruction i: instructionTable){
+        for(Instruction i: lookUpTable){
             if(i.instructionName.equals(instrParts[0]))
                 instructionToDecodeType = i;
         }
+        
         if(instructionToDecodeType == null){
             System.err.println("Instruction " + instrParts[0] + " is not a"
                     + "valid instruction!");
         }
         
         if(!instructionToDecodeType.instructionType.equals(Constants.TYPE_J)){
-           String[] instrOperands = instrParts[1].split(",");
+           String[] instrOperands = instrParts[1].split(", ");
            
         }
         
@@ -83,7 +99,7 @@ public class MIPSAssembler {
                 inputFile = new Scanner(new File(inputFileName));
                 break;
             } catch (FileNotFoundException ex) {
-                System.out.println("File not found!");
+                System.err.println("File not found!");
             }
         }
 
@@ -98,7 +114,7 @@ public class MIPSAssembler {
                 outputFile = new FileWriter(outputFileName);
                 break;
             } catch (IOException ex) {
-                System.out.println(outputFileName + "could not created!");
+                System.err.println(outputFileName + "could not created!");
             }
         }
 
@@ -146,9 +162,9 @@ public class MIPSAssembler {
         String answer;
 
         try {
-            fillInstructionTable();
+            fillLookUpTable();
         } catch (FileNotFoundException ex) {
-            System.out.println(Constants.lookUpTableFileName + " is not found!");
+            System.err.println(Constants.lookUpTableFileName + " is not found!");
             System.exit(1);
         }
 
