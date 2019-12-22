@@ -10,5 +10,7 @@ public class Constants {
 
     public static final String lookUpTableFileName = "lookUpTable.txt";
     public static final long firstMIPSMemoryLocation = 0x8000100L; // given in PDF
+    
+    public static final String errorTag = "err: ";
 
 }

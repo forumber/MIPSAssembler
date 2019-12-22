@@ -1,5 +1,4 @@
 // Test at https://csfieldguide.org.nz/en/interactives/mips-assembler/
-
 package MIPSAssembler;
 
 import java.io.*;
@@ -12,7 +11,7 @@ public class MIPSAssembler {
     public static Scanner consoleInput = new Scanner(System.in);
 
     // TEST
-    public static void printInstructionTable() {
+    public static void printLookUpTable() {
         for (InstructionList i : lookUpTable) {
             System.out.println(i.instructionType + " type instructions;");
             i.instruction.entrySet().forEach(entry -> {
@@ -25,7 +24,7 @@ public class MIPSAssembler {
     public static void fillLookUpTable() throws FileNotFoundException {
         Scanner lookUpTableFile = new Scanner(new File(Constants.lookUpTableFileName));
         int lineCounter = 0;
-        
+
         lookUpTable.add(new InstructionList(Constants.TYPE_I));
         lookUpTable.add(new InstructionList(Constants.TYPE_J));
         lookUpTable.add(new InstructionList(Constants.TYPE_R));
@@ -34,29 +33,27 @@ public class MIPSAssembler {
 
         while (lookUpTableFile.hasNextLine()) {
             boolean found = false;
-            
+
             String nextLine = lookUpTableFile.nextLine();
             lineCounter++;
-            
+
             // TODO: Change theInstruction variable name
             if (!(nextLine.startsWith("#") || nextLine.isEmpty())) {
                 String[] theInstruction = nextLine.split(" ");
-                
-                for (InstructionList i: lookUpTable)
-                    if (theInstruction[0].equals(i.instructionType))
-                    {
+
+                for (InstructionList i : lookUpTable) {
+                    if (theInstruction[0].equals(i.instructionType)) {
                         found = true;
-                        if (i.add(theInstruction[1], theInstruction[2]))
-                        {
+                        if (i.add(theInstruction[1], theInstruction[2])) {
                             System.err.println("");
                             System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
                             System.err.println("Line " + lineCounter + ": The instruction or opcode/function is already being used!");
                             System.exit(1);
                         }
                     }
-                
-                if (!found)
-                {
+                }
+
+                if (!found) {
                     System.err.println("");
                     System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
                     System.err.println("Line " + lineCounter + ": " + theInstruction[0] + " is not a valid instruction type!");
@@ -69,36 +66,55 @@ public class MIPSAssembler {
         lookUpTableFile.close();
     }
 
-    public static long assemble(String instructionToDecode) {
+    public static String assemble(String instructionToDecode) {
         String instructionToDecodeType = "";
         String instructionOpCode = "";
-        
-        if (instructionToDecode.contains(", "))
+
+        if (instructionToDecode.contains(", ")) {
             instructionToDecode = instructionToDecode.replace(", ", " ");
-        else
+        } else {
             instructionToDecode = instructionToDecode.replace(",", " ");
-        
+        }
+
         String[] instrParts = instructionToDecode.split(" ");
-        for(InstructionList i: lookUpTable){
-            if(i.instruction.containsKey(instrParts[0]))
-            {
+        for (InstructionList i : lookUpTable) {
+            if (i.instruction.containsKey(instrParts[0])) {
                 instructionToDecodeType = i.instructionType;
                 instructionOpCode = i.instruction.get(instrParts[0]);
             }
         }
-        
-        if(instructionToDecodeType.isEmpty()){
-            System.err.println("Instruction " + instrParts[0] + " is not a valid instruction!");
-            return -1;
+
+        if (instructionToDecodeType.isEmpty()) {
+            return (Constants.errorTag + "Instruction " + instrParts[0] + " is not a valid instruction!");
         }
-        
-        return Constants.firstMIPSMemoryLocation; // test
+
+        return "assemble() end"; // test
+    }
+
+    public static List<String> assembleBatch(List<String> instructionsToDecode) {
+        List<String> assembledInstructionsToReturn = new ArrayList<>();
+
+        int lineCounter = 0;
+
+        for (String i : instructionsToDecode) {
+            String assembledInstruction = assemble(i);
+            lineCounter++;
+            if (assembledInstruction.startsWith(Constants.errorTag)) {
+                System.err.println("");
+                System.err.println("An error has occurred while assembling the instruction");
+                System.err.println("Line " + lineCounter + ": " + assembledInstruction.replace(Constants.errorTag, ""));
+                return null;
+            }
+        }
+
+        return assembledInstructionsToReturn;
     }
 
     public static void batchMode() {
         System.out.println("BATCH MODE");
 
         String inputFileName, outputFileName;
+        List<String> instructionsToWrite;
         Scanner inputFile;
         FileWriter outputFile;
 
@@ -120,55 +136,71 @@ public class MIPSAssembler {
             }
         }
 
-        while (true) {
-            System.out.print("Enter name of output file: ");
-            outputFileName = consoleInput.nextLine();
-            if (!outputFileName.contains(".obj")) {
-                outputFileName += ".obj";
-            }
-
-            try {
-                outputFile = new FileWriter(outputFileName);
-                break;
-            } catch (IOException ex) {
-                System.err.println(outputFileName + "could not created!");
-            }
-        }
-
         while (inputFile.hasNextLine()) {
             instructionsToAssemble.add(inputFile.nextLine());
         }
 
-        // TEST
-        while (inputFile.hasNextLine())
+        instructionsToWrite = assembleBatch(instructionsToAssemble);
+
+        if (instructionsToWrite != null) {
+            while (true) {
+                System.out.print("Enter name of output file: ");
+                outputFileName = consoleInput.nextLine();
+                if (!outputFileName.contains(".obj")) {
+                    outputFileName += ".obj";
+                }
+
+                try {
+                    outputFile = new FileWriter(outputFileName);
+                    break;
+                } catch (IOException ex) {
+                    System.err.println(outputFileName + "could not created!");
+                }
+            }
+
+            for (String i : instructionsToWrite) {
+                try {
+                    outputFile.write(i);
+                    outputFile.write("\n");
+                } catch (IOException ex) {
+                    System.out.println("Could not write to file " + outputFileName);
+                }
+            }
+
             try {
-                outputFile.write(inputFile.nextLine());
-                outputFile.write("\n");
+                outputFile.close();
+                System.out.println("File write operation has been completed successfully!");
             } catch (IOException ex) {
                 System.out.println("Could not write to file " + outputFileName);
             }
-        
-        try {
-            outputFile.close();
-            System.out.println("File write operation has been completed successfully!");
-        } catch (IOException ex) {
-            System.out.println("Could not write to file " + outputFileName);
         }
-        System.exit(0);
+
     }
 
     public static void interactiveMode() {
         System.out.println("INTERACTIVE MODE");
 
+        List<String> instructionsToAssemble = new ArrayList<>();
+        List<String> instructionsToPrint;
+
         while (true) {
             System.out.println("");
-            System.out.print("Enter instruction (-1 to exit): ");
+            System.out.println("Enter instructions (-1 to start assembling):");
             String theInstructionFromTerminalInput = consoleInput.nextLine();
 
             if (theInstructionFromTerminalInput.equals("-1")) {
-                System.exit(0);
+                instructionsToPrint = assembleBatch(instructionsToAssemble);
+                break;
             } else {
-                System.out.println("0x" + Long.toHexString(assemble(theInstructionFromTerminalInput)));
+                instructionsToAssemble.add(theInstructionFromTerminalInput);
+            }
+        }
+
+        if (instructionsToPrint != null) {
+            System.out.println("");
+            System.out.println("Assembled instructions:");
+            for (String i : instructionsToPrint) {
+                System.out.println(i);
             }
         }
     }
@@ -184,7 +216,7 @@ public class MIPSAssembler {
             System.exit(1);
         }
 
-        printInstructionTable();
+        printLookUpTable();
 
         while (true) {
             System.out.println("");
