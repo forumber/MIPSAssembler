@@ -13,9 +13,15 @@ public class InstructionList {
         this.instructionType = instructionType;
     }
     
-    public void add(String instructionName, String opCode)
+    public boolean add(String instructionName, String opCode)
     {
-        instruction.put(instructionName, opCode);
+        if (instruction.containsKey(instructionName) || instruction.containsValue(opCode))
+            return true;
+        else
+        {
+            instruction.put(instructionName, opCode);
+            return false;
+        }
     }
 
     

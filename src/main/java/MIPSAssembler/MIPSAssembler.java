@@ -46,7 +46,13 @@ public class MIPSAssembler {
                     if (theInstruction[0].equals(i.instructionType))
                     {
                         found = true;
-                        i.add(theInstruction[1], theInstruction[2]);
+                        if (i.add(theInstruction[1], theInstruction[2]))
+                        {
+                            System.err.println("");
+                            System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
+                            System.err.println("Line " + lineCounter + ": The instruction or opcode/function is already being used!");
+                            System.exit(1);
+                        }
                     }
                 
                 if (!found)
@@ -67,6 +73,10 @@ public class MIPSAssembler {
         String instructionToDecodeType = "";
         String instructionOpCode = "";
         
+        if (instructionToDecode.contains(", "))
+            instructionToDecode = instructionToDecode.replace(", ", " ");
+        else
+            instructionToDecode = instructionToDecode.replace(",", " ");
         
         String[] instrParts = instructionToDecode.split(" ");
         for(InstructionList i: lookUpTable){
@@ -78,12 +88,8 @@ public class MIPSAssembler {
         }
         
         if(instructionToDecodeType.isEmpty()){
-            System.err.println("Instruction " + instrParts[0] + " is not a"
-                    + "valid instruction!");
-        }
-        
-        if(!instructionToDecodeType.equals(Constants.TYPE_J)){
-           String[] instrOperands = instrParts[1].split(", ");
+            System.err.println("Instruction " + instrParts[0] + " is not a valid instruction!");
+            return -1;
         }
         
         return Constants.firstMIPSMemoryLocation; // test
