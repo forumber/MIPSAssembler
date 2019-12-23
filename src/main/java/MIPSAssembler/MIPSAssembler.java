@@ -1,5 +1,6 @@
-// Test at https://csfieldguide.org.nz/en/interactives/mips-assembler/
+// Test at https://csfieldguide.org.nz/en/interact  ives/mips-assembler/
 package MIPSAssembler;
+
 
 import java.io.*;
 import java.util.*;
@@ -75,8 +76,8 @@ public class MIPSAssembler {
 
         for (Entry<String, Map<String, String>> i : lookUpTable.entrySet()) {
             for (Entry<String, String> j : i.getValue().entrySet()) {
-                if (j.getKey().equals(instrParts)) {
-                    instructionToDecodeType = j.getValue();
+                if (j.getKey().equals(instrParts[0])) {
+                    instructionToDecodeType = i.getKey();
                 }
             }
         }
@@ -87,23 +88,21 @@ public class MIPSAssembler {
 
         switch (instructionToDecodeType) {
             case Constants.TYPE_I:
-                iTypeAssemble(instrParts);
-                break;
-            /*case Constants.TYPE_R:
-                rTypeAssemble(instrParts);
-                break;
-            case Constants.TYPE_J:
+                return iTypeAssemble(instrParts);
+            case Constants.TYPE_R:
+                return rTypeAssemble(instrParts);
+
+            /*case Constants.TYPE_J:
                 jTypeAssemble(instrParts);
                 break;
             case Constants.TYPE_MEMORY:
                 memoryTypeAssemble(instrParts);
                 break;*/
             default:
-                break;
+                return null;
 
         }
 
-        return "assemble() end"; // test
     }
 
     public static List<String> assembleBatch(List<String> instructionsToDecode) {
@@ -119,6 +118,8 @@ public class MIPSAssembler {
                 System.err.println("An error has occurred while assembling the instruction");
                 System.err.println("Line " + lineCounter + ": " + assembledInstruction.replace(Constants.errorTag, ""));
                 return null;
+            }else{
+                assembledInstructionsToReturn.add(assembledInstruction);
             }
         }
 
@@ -255,17 +256,42 @@ public class MIPSAssembler {
     public static String iTypeAssemble(String[] instrParts) {
         String bin32instr = "";
         
-        bin32instr += lookUpTable.get("i").get(instrParts[0]);
+        bin32instr += lookUpTable.get(Constants.TYPE_I).get(instrParts[0]);
         
         System.out.println(bin32instr);
         bin32instr += registerDecode(instrParts[1]);
         bin32instr += registerDecode(instrParts[2]);
+        String immidieateField = Integer.toBinaryString(Integer.valueOf(instrParts[3]));
         
+        String oldString = "";
+        for(int i = 0; i < 16 - immidieateField.length(); i++){
+            oldString += "0";
+        }
+        immidieateField = oldString + immidieateField;
+        
+        bin32instr += immidieateField;
+       
         return bin32instr;
     }
 
     public static String registerDecode(String registerToDecode) {
-        return null;
+        return lookUpTable.get(Constants.TYPE_REGISTER).get(registerToDecode);}
+
+    private static String rTypeAssemble(String[] instrParts) {
+       String bin32instr = "000000";
+        
+        
+        
+        
+        bin32instr += registerDecode(instrParts[1]);
+        bin32instr += registerDecode(instrParts[2]);
+        bin32instr += registerDecode(instrParts[3]);
+        //TODO LOOK FOR SHIFTING INSTRUCTIONS TO ADD TO SHAMT
+        bin32instr += "00000"; //if no shifting is present
+        bin32instr += lookUpTable.get(Constants.TYPE_R).get(instrParts[0]);   
+        System.out.println(bin32instr);
+       
+        return bin32instr;
     }
 
 }
