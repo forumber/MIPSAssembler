@@ -250,18 +250,20 @@ public class MIPSAssembler {
                 System.out.println("Wrong input!");
             }
         }
+    }
 
+    public static String registerDecode(String registerToDecode) {
+        return lookUpTable.get(Constants.TYPE_REGISTER).get(registerToDecode);
     }
 
     public static String iTypeAssemble(String[] instrParts) {
         String bin32instr = "";
         
-        bin32instr += lookUpTable.get(Constants.TYPE_I).get(instrParts[0]);
-        
-        System.out.println(bin32instr);
-        bin32instr += registerDecode(instrParts[1]);
-        bin32instr += registerDecode(instrParts[2]);
-        String immidieateField = Integer.toBinaryString(Integer.valueOf(instrParts[3]));
+        // i type format: opcode (6) rs (5) rt (5) immediate (16)
+        bin32instr += lookUpTable.get(Constants.TYPE_I).get(instrParts[0]); // opcode
+        bin32instr += registerDecode(instrParts[2]); // rs
+        bin32instr += registerDecode(instrParts[1]); // rt
+        String immidieateField = Integer.toBinaryString(Integer.valueOf(instrParts[3])); // imm
         
         String oldString = "";
         for(int i = 0; i < 16 - immidieateField.length(); i++){
@@ -274,22 +276,16 @@ public class MIPSAssembler {
         return bin32instr;
     }
 
-    public static String registerDecode(String registerToDecode) {
-        return lookUpTable.get(Constants.TYPE_REGISTER).get(registerToDecode);}
-
     private static String rTypeAssemble(String[] instrParts) {
-       String bin32instr = "000000";
+        // r type format: opcode (6) rs (5) rt (5) rd (5) shamt (5) funct (6)
+        String bin32instr = "000000"; // opcode
         
-        
-        
-        
-        bin32instr += registerDecode(instrParts[1]);
-        bin32instr += registerDecode(instrParts[2]);
-        bin32instr += registerDecode(instrParts[3]);
+        bin32instr += registerDecode(instrParts[2]); // rs
+        bin32instr += registerDecode(instrParts[3]); // rt
+        bin32instr += registerDecode(instrParts[1]); // rd
         //TODO LOOK FOR SHIFTING INSTRUCTIONS TO ADD TO SHAMT
         bin32instr += "00000"; //if no shifting is present
-        bin32instr += lookUpTable.get(Constants.TYPE_R).get(instrParts[0]);   
-        System.out.println(bin32instr);
+        bin32instr += lookUpTable.get(Constants.TYPE_R).get(instrParts[0]); // funct
        
         return bin32instr;
     }
