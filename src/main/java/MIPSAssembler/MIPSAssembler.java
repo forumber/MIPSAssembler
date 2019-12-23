@@ -6,7 +6,7 @@ import java.util.*;
 
 public class MIPSAssembler {
 
-    public static List<InstructionList> lookUpTable = new ArrayList<>();
+    public static Map<String, Map<String, String>> lookUpTable = new HashMap<>();
 
     public static Scanner consoleInput = new Scanner(System.in);
 
@@ -68,7 +68,6 @@ public class MIPSAssembler {
 
     public static String assemble(String instructionToDecode) {
         String instructionToDecodeType = "";
-        String instructionOpCode = "";
 
         if (instructionToDecode.contains(", ")) {
             instructionToDecode = instructionToDecode.replace(", ", " ");
@@ -80,12 +79,29 @@ public class MIPSAssembler {
         for (InstructionList i : lookUpTable) {
             if (i.instruction.containsKey(instrParts[0])) {
                 instructionToDecodeType = i.instructionType;
-                instructionOpCode = i.instruction.get(instrParts[0]);
             }
         }
 
         if (instructionToDecodeType.isEmpty()) {
             return (Constants.errorTag + "Instruction " + instrParts[0] + " is not a valid instruction!");
+        }
+
+        switch (instructionToDecodeType) {
+            case Constants.TYPE_I:
+                iTypeAssemble(instrParts);
+                break;
+            /*case Constants.TYPE_R:
+                rTypeAssemble(instrParts);
+                break;
+            case Constants.TYPE_J:
+                jTypeAssemble(instrParts);
+                break;
+            case Constants.TYPE_MEMORY:
+                memoryTypeAssemble(instrParts);
+                break;*/
+            default:
+                break;
+
         }
 
         return "assemble() end"; // test
@@ -183,9 +199,10 @@ public class MIPSAssembler {
         List<String> instructionsToAssemble = new ArrayList<>();
         List<String> instructionsToPrint;
 
+        System.out.println("");
+        System.out.println("Enter instructions (-1 to start assembling):");
+
         while (true) {
-            System.out.println("");
-            System.out.println("Enter instructions (-1 to start assembling):");
             String theInstructionFromTerminalInput = consoleInput.nextLine();
 
             if (theInstructionFromTerminalInput.equals("-1")) {
@@ -236,4 +253,21 @@ public class MIPSAssembler {
 
     }
 
+    public static void iTypeAssemble(String[] instrParts) {
+        String bin32instr = "";
+        for (InstructionList i : lookUpTable) {
+            if (i.instructionType.equals(Constants.TYPE_I)) {
+                bin32instr += i.instruction.get(instrParts[0]);
+            }
+        }
+        System.out.println(bin32instr);
+        bin32instr += registerDecode(instrParts[1], lookUpTable);
+        bin32instr += registerDecode((instrParts[2]), lookUpTable);
+    }
+   
+    public static String registerDecode(String registerToDecode) {
+        return ins;
+    }
+    
+    
 }
