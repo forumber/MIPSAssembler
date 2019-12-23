@@ -3,6 +3,7 @@ package MIPSAssembler;
 
 import java.io.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 public class MIPSAssembler {
 
@@ -12,27 +13,25 @@ public class MIPSAssembler {
 
     // TEST
     public static void printLookUpTable() {
-        for (InstructionList i : lookUpTable) {
-            System.out.println(i.instructionType + " type instructions;");
-            i.instruction.entrySet().forEach(entry -> {
-                System.out.println(entry.getKey() + " " + entry.getValue());
+        lookUpTable.entrySet().forEach(entry -> {
+            System.out.println(entry.getKey() + " instructions: ");
+            entry.getValue().entrySet().forEach(entryIn -> {
+                System.out.println(entryIn.getKey() + " " + entryIn.getValue());
             });
-            System.out.println("");
-        }
+        });
     }
 
     public static void fillLookUpTable() throws FileNotFoundException {
         Scanner lookUpTableFile = new Scanner(new File(Constants.lookUpTableFileName));
         int lineCounter = 0;
 
-        lookUpTable.add(new InstructionList(Constants.TYPE_I));
-        lookUpTable.add(new InstructionList(Constants.TYPE_J));
-        lookUpTable.add(new InstructionList(Constants.TYPE_R));
-        lookUpTable.add(new InstructionList(Constants.TYPE_MEMORY));
-        lookUpTable.add(new InstructionList(Constants.TYPE_REGISTER));
+        lookUpTable.put(Constants.TYPE_I, new HashMap<>());
+        lookUpTable.put(Constants.TYPE_J, new HashMap<>());
+        lookUpTable.put(Constants.TYPE_R, new HashMap<>());
+        lookUpTable.put(Constants.TYPE_MEMORY, new HashMap<>());
+        lookUpTable.put(Constants.TYPE_REGISTER, new HashMap<>());
 
         while (lookUpTableFile.hasNextLine()) {
-            boolean found = false;
 
             String nextLine = lookUpTableFile.nextLine();
             lineCounter++;
@@ -41,30 +40,27 @@ public class MIPSAssembler {
             if (!(nextLine.startsWith("#") || nextLine.isEmpty())) {
                 String[] theInstruction = nextLine.split(" ");
 
-                for (InstructionList i : lookUpTable) {
-                    if (theInstruction[0].equals(i.instructionType)) {
-                        found = true;
-                        if (i.add(theInstruction[1], theInstruction[2])) {
-                            System.err.println("");
-                            System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
-                            System.err.println("Line " + lineCounter + ": The instruction or opcode/function is already being used!");
-                            System.exit(1);
-                        }
+                if (lookUpTable.containsKey(theInstruction[0])) {
+                    if (lookUpTable.get(theInstruction[0]).containsKey(theInstruction[1]) || lookUpTable.get(theInstruction[0]).containsValue(theInstruction[2])) {
+                        System.err.println("");
+                        System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
+                        System.err.println("Line " + lineCounter + ": The instruction or opcode/function is already being used!");
+                        System.exit(1);
+                    } else {
+                        lookUpTable.get(theInstruction[0]).put(theInstruction[1], theInstruction[2]);
                     }
-                }
-
-                if (!found) {
+                } else {
                     System.err.println("");
                     System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
                     System.err.println("Line " + lineCounter + ": " + theInstruction[0] + " is not a valid instruction type!");
                     System.exit(1);
                 }
-
             }
         }
-
         lookUpTableFile.close();
     }
+
+    
 
     public static String assemble(String instructionToDecode) {
         String instructionToDecodeType = "";
@@ -76,9 +72,12 @@ public class MIPSAssembler {
         }
 
         String[] instrParts = instructionToDecode.split(" ");
-        for (InstructionList i : lookUpTable) {
-            if (i.instruction.containsKey(instrParts[0])) {
-                instructionToDecodeType = i.instructionType;
+
+        for (Entry<String, Map<String, String>> i : lookUpTable.entrySet()) {
+            for (Entry<String, String> j : i.getValue().entrySet()) {
+                if (j.getKey().equals(instrParts)) {
+                    instructionToDecodeType = j.getValue();
+                }
             }
         }
 
@@ -253,21 +252,20 @@ public class MIPSAssembler {
 
     }
 
-    public static void iTypeAssemble(String[] instrParts) {
+    public static String iTypeAssemble(String[] instrParts) {
         String bin32instr = "";
-        for (InstructionList i : lookUpTable) {
-            if (i.instructionType.equals(Constants.TYPE_I)) {
-                bin32instr += i.instruction.get(instrParts[0]);
-            }
-        }
+        
+        bin32instr += lookUpTable.get("i").get(instrParts[0]);
+        
         System.out.println(bin32instr);
-        bin32instr += registerDecode(instrParts[1], lookUpTable);
-        bin32instr += registerDecode((instrParts[2]), lookUpTable);
+        bin32instr += registerDecode(instrParts[1]);
+        bin32instr += registerDecode(instrParts[2]);
+        
+        return bin32instr;
     }
-   
+
     public static String registerDecode(String registerToDecode) {
-        return ins;
+        return null;
     }
-    
-    
+
 }
