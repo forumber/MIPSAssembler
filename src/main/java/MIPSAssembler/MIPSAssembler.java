@@ -54,8 +54,9 @@ public class MIPSAssembler {
         while (lookUpTableFile.hasNextLine()) {
 
             String nextLine = lookUpTableFile.nextLine();
-            if (nextLine.contains("#") && !nextLine.startsWith("#"))
+            if (nextLine.contains("#") && !nextLine.startsWith("#")) {
                 nextLine = nextLine.substring(0, nextLine.indexOf("#"));
+            }
             lineCounter++;
 
             // TODO: Change theInstruction variable name
@@ -117,7 +118,7 @@ public class MIPSAssembler {
     }
 
     public static String assemble(String instructionToDecode, int currentInstrLine, long PC) {
-        
+
         String instructionToDecodeType = "";
 
         instructionToDecode = instructionToDecode.replace(", ", " ");
@@ -145,7 +146,7 @@ public class MIPSAssembler {
 
             case Constants.TYPE_J:
                 return jTypeAssemble(instrParts);
-               
+
             case Constants.TYPE_MEMORY:
                 return memoryTypeAssemble(instrParts);
 
@@ -222,7 +223,7 @@ public class MIPSAssembler {
                     outputFile = new FileWriter(outputFileName);
                     break;
                 } catch (IOException ex) {
-                    System.err.println(outputFileName + "could not created!");
+                    System.err.println(outputFileName + " could not created!");
                 }
             }
 
@@ -475,41 +476,61 @@ public class MIPSAssembler {
         int instrLineCounter = 0;
         List<String> temp = new ArrayList<>();
         for (String instr : instructionsToDecode) {
-            if (!instr.endsWith(":")) {
-                instrLineCounter++;
-                temp.add(instr);
-            } else {
-                long theLabelAddress = Constants.firstMIPSMemoryLocation + 4*instrLineCounter;
+            if (instr.endsWith(":")) {
+                long theLabelAddress = Constants.firstMIPSMemoryLocation + 4 * instrLineCounter;
                 labelIndex.put(instr.replace(":", ""), instrLineCounter);
                 labelAddress.put(instr.replace(":", ""), theLabelAddress);
-
+            } else if (instr.contains(":")) {
+                long theLabelAddress = Constants.firstMIPSMemoryLocation + 4 * instrLineCounter;
+                labelIndex.put(instr.substring(0, instr.indexOf(":")), instrLineCounter);
+                labelAddress.put(instr.substring(0, instr.indexOf(":")), theLabelAddress);
+                
+                instrLineCounter++;
+                String tempString = instr.substring(instr.indexOf(":") + 1);
+                while (tempString.startsWith(" "))
+                    tempString = tempString.substring(1);
+                temp.add(tempString);
+            } else {
+                instrLineCounter++;
+                temp.add(instr);
             }
         }
         return temp;
-        
 
     }
 
-    public static String jTypeAssemble(String[] instrParts) { 
-        
-        return lookUpTable.get(Constants.TYPE_J).get(instrParts[0]) +
-                Long.toBinaryString(Long.parseLong(Long.toHexString(labelAddress.get(instrParts[1])), 16))
-                .substring(6);
+    public static String jTypeAssemble(String[] instrParts) {
+        return lookUpTable.get(Constants.TYPE_J).get(instrParts[0])
+                + Long.toBinaryString(Long.parseLong(Long.toHexString(labelAddress.get(instrParts[1])), 16))
+                        .substring(6);
     }
 
     public static String memoryTypeAssemble(String[] instrParts) {
-        String immediateField = Integer.toBinaryString(Integer.valueOf(instrParts[3]));
+        String theMemoryAndOffset = instrParts[2];
+        theMemoryAndOffset = theMemoryAndOffset.replace("(", " ");
+        theMemoryAndOffset = theMemoryAndOffset.replace(")", "");
+        
+        List<String> tempInstrPartsList = new LinkedList<String>(Arrays.asList(instrParts));
+        tempInstrPartsList.remove(2);
+        
+        String[] theMemoryAndOffsetArray = theMemoryAndOffset.split(" ");
+        tempInstrPartsList.add(theMemoryAndOffsetArray[0]);
+        tempInstrPartsList.add(theMemoryAndOffsetArray[1]);
+        
+        instrParts = tempInstrPartsList.toArray(new String[tempInstrPartsList.size()]);
+        
+        String immediateField = Integer.toBinaryString(Integer.valueOf(instrParts[2]));
         String oldString = "";
         for (int i = 0; i < 16 - immediateField.length(); i++) {
             oldString += "0";
         }
         immediateField = oldString + immediateField;
-        
-        return lookUpTable.get(Constants.TYPE_MEMORY).get(instrParts[0]) +
-                lookUpTable.get(Constants.TYPE_REGISTER).get(instrParts[2]) +
-                lookUpTable.get(Constants.TYPE_REGISTER).get(instrParts[1]) +
-                immediateField;
-                
+
+        return lookUpTable.get(Constants.TYPE_MEMORY).get(instrParts[0])
+                + lookUpTable.get(Constants.TYPE_REGISTER).get(instrParts[3])
+                + lookUpTable.get(Constants.TYPE_REGISTER).get(instrParts[1])
+                + immediateField;
+
     }
 
 }
