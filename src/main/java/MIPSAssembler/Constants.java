@@ -25,5 +25,6 @@ public class Constants {
     public static final String errorRegisterIsNotFoundMessage = "Entered register is not found in application's register referance table!";
     public static final String errorImmediateIsOutOfRangeMessage = "Entered immediate value is out of range!";
     public static final String errorImmediateFieldIsNotValidMessage = "Entered immediate value is not valid!";
+    public static final String errorLabelNotFoundMessage = "Entered label is not found in the code!";
 
 }

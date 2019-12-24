@@ -362,8 +362,8 @@ public class MIPSAssembler {
         } else if (operandDecodeOrder.get(Constants.OP_TYPE_LABEL) != 0) {
             try {
                 immidieateField = Integer.toBinaryString(labelIndex.get(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_LABEL)]) - currentInstrLine); // imm
-            } catch (NumberFormatException ex) {
-                return Constants.errorTag;//+ Constants.errorImmediateFieldIsNotValidMessage; TODO 
+            } catch (Exception ex) {
+                return Constants.errorTag + Constants.errorLabelNotFoundMessage;
             }
         }
         
