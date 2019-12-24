@@ -2,10 +2,12 @@
 
 if exist build\libs\MIPSAssembler.jar (
 	xcopy /y lookUpTable.txt build\libs
+	xcopy /y testCode.src build\libs
+	cd build\libs
 	cls
-    java -jar build\libs\MIPSAssembler.jar
+	java -jar MIPSAssembler.jar
 ) else (
-    echo Build it first!
+	echo Build it first!
 )
 
 pause

@@ -1,0 +1,11 @@
+main:
+beq $s1, $s2, main
+beq $s1, $s2, main
+add $s1, $s2, $s3
+beq $s1, $s2, test
+add $s1, $s2, $s3
+add $s1, $s2, $s3
+test:
+add $s1, $s2, $s3
+add $s1, $s2, $s3
+beq $s1, $s2, ara
