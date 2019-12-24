@@ -263,6 +263,7 @@ public class MIPSAssembler {
 
     public static String iTypeAssemble(String[] instrParts) {
         String bin32instr = "";
+        String immidieateField = null;
         String registerDecodeResult;
         
         // i type format: opcode (6) rs (5) rt (5) immediate (16)
@@ -280,7 +281,11 @@ public class MIPSAssembler {
         else
             return registerDecodeResult;
         
-        String immidieateField = Integer.toBinaryString(Integer.valueOf(instrParts[3])); // imm
+        try {
+            immidieateField = Integer.toBinaryString(Integer.valueOf(instrParts[3])); // imm
+        } catch (NumberFormatException ex) {
+            return Constants.errorTag + Constants.errorImmediateFieldIsNotValidMessage;
+        }
         
         if (immidieateField.length() > 16)
             return Constants.errorTag + Constants.errorImmediateIsOutOfRangeMessage;
