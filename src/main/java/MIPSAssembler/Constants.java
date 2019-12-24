@@ -15,7 +15,7 @@ public class Constants {
     public static final String OP_TYPE_LABEL = "label";
 
     public static final String lookUpTableFileName = "lookUpTable.txt";
-    public static final long firstMIPSMemoryLocation = 0x8000100L; // given in PDF
+    public static final long firstMIPSMemoryLocation = 0x80001000L; // given in PDF
     
     public static final String errorTag = "err: ";
     public static final String errorOperandIsNotValidMessage = "Entered operand(s) are not valid!";

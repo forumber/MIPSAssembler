@@ -11,7 +11,7 @@ public class MIPSAssembler {
     public static Map<String, List<String>> permittedOperands = new HashMap<>();
     public static Map<String, Map<String, Integer>> customOperands = new HashMap<>();
     public static Map<String, Integer> labelIndex = new HashMap<>();
-
+    public static Map<String, Long> labelAddress = new HashMap<>();
     public static Scanner consoleInput = new Scanner(System.in);
 
     // TEST
@@ -116,8 +116,8 @@ public class MIPSAssembler {
         lookUpTableFile.close();
     }
 
-    public static String assemble(String instructionToDecode, int currentInstrLine) {
-
+    public static String assemble(String instructionToDecode, int currentInstrLine, long PC) {
+        
         String instructionToDecodeType = "";
 
         instructionToDecode = instructionToDecode.replace(", ", " ");
@@ -143,12 +143,12 @@ public class MIPSAssembler {
             case Constants.TYPE_R:
                 return rTypeAssemble(instrParts);
 
-            /*case Constants.TYPE_J:
-                jTypeAssemble(instrParts);
-                break;
+            case Constants.TYPE_J:
+                return jTypeAssemble(instrParts);
+               
             case Constants.TYPE_MEMORY:
-                memoryTypeAssemble(instrParts);
-                break;*/
+                return memoryTypeAssemble(instrParts);
+
             default:
                 return null;
 
@@ -160,10 +160,11 @@ public class MIPSAssembler {
         List<String> labellessInstructionsToDecode = findAllLabelIndexes(instructionsToDecode);
         List<String> assembledInstructionsToReturn = new ArrayList<>();
         int instructionLineCounter = 0;
-
+        long PC = Constants.firstMIPSMemoryLocation;
         for (String i : labellessInstructionsToDecode) {
-            String assembledInstruction = assemble(i, instructionLineCounter);
+            String assembledInstruction = assemble(i, instructionLineCounter, PC);
             instructionLineCounter++;
+            PC += 4;
             if (assembledInstruction.startsWith(Constants.errorTag)) {
                 System.err.println("");
                 System.err.println("An error has occurred while assembling the instruction");
@@ -478,11 +479,37 @@ public class MIPSAssembler {
                 instrLineCounter++;
                 temp.add(instr);
             } else {
+                long theLabelAddress = Constants.firstMIPSMemoryLocation + 4*instrLineCounter;
                 labelIndex.put(instr.replace(":", ""), instrLineCounter);
+                labelAddress.put(instr.replace(":", ""), theLabelAddress);
+
             }
         }
-
         return temp;
+        
+
+    }
+
+    public static String jTypeAssemble(String[] instrParts) { 
+        
+        return lookUpTable.get(Constants.TYPE_J).get(instrParts[0]) +
+                Long.toBinaryString(Long.parseLong(Long.toHexString(labelAddress.get(instrParts[1])), 16))
+                .substring(6);
+    }
+
+    public static String memoryTypeAssemble(String[] instrParts) {
+        String immediateField = Integer.toBinaryString(Integer.valueOf(instrParts[3]));
+        String oldString = "";
+        for (int i = 0; i < 16 - immediateField.length(); i++) {
+            oldString += "0";
+        }
+        immediateField = oldString + immediateField;
+        
+        return lookUpTable.get(Constants.TYPE_MEMORY).get(instrParts[0]) +
+                lookUpTable.get(Constants.TYPE_REGISTER).get(instrParts[2]) +
+                lookUpTable.get(Constants.TYPE_REGISTER).get(instrParts[1]) +
+                immediateField;
+                
     }
 
 }
