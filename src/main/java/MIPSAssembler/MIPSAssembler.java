@@ -257,7 +257,7 @@ public class MIPSAssembler {
                 return Constants.errorTag + Constants.errorRegisterIsNotFoundMessage;
             }
         } else {
-            return Constants.errorTag + Constants.errorIsNotRegisterMessage;
+            return Constants.errorTag + Constants.errorOperandIsNotValidMessage;
         }
     }
 
