@@ -1,8 +1,5 @@
 package MIPSAssembler;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Constants {
 
     public static final String TYPE_R = "r";
