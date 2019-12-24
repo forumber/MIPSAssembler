@@ -66,11 +66,8 @@ public class MIPSAssembler {
     public static String assemble(String instructionToDecode) {
         String instructionToDecodeType = "";
 
-        if (instructionToDecode.contains(", ")) {
-            instructionToDecode = instructionToDecode.replace(", ", " ");
-        } else {
-            instructionToDecode = instructionToDecode.replace(",", " ");
-        }
+        instructionToDecode = instructionToDecode.replace(", ", " ");
+        instructionToDecode = instructionToDecode.replace(",", " ");
 
         String[] instrParts = instructionToDecode.split(" ");
 
