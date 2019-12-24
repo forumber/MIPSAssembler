@@ -276,7 +276,7 @@ public class MIPSAssembler {
         return bin32instr;
     }
 
-    private static String rTypeAssemble(String[] instrParts) {
+    public static String rTypeAssemble(String[] instrParts) {
         // r type format: opcode (6) rs (5) rt (5) rd (5) shamt (5) funct (6)
         String bin32instr = "000000"; // opcode
         
