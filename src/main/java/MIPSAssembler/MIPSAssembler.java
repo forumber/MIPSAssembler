@@ -253,17 +253,40 @@ public class MIPSAssembler {
     }
 
     public static String registerDecode(String registerToDecode) {
-        return lookUpTable.get(Constants.TYPE_REGISTER).get(registerToDecode);
+        if (registerToDecode.startsWith("$")) {
+            if (lookUpTable.get(Constants.TYPE_REGISTER).containsKey(registerToDecode)) {
+                return lookUpTable.get(Constants.TYPE_REGISTER).get(registerToDecode);
+            } else {
+                return Constants.errorTag + Constants.errorRegisterIsNotFoundMessage;
+            }
+        } else {
+            return Constants.errorTag + Constants.errorIsNotRegisterMessage;
+        }
     }
 
     public static String iTypeAssemble(String[] instrParts) {
         String bin32instr = "";
+        String registerDecodeResult;
         
         // i type format: opcode (6) rs (5) rt (5) immediate (16)
         bin32instr += lookUpTable.get(Constants.TYPE_I).get(instrParts[0]); // opcode
-        bin32instr += registerDecode(instrParts[2]); // rs
-        bin32instr += registerDecode(instrParts[1]); // rt
+        
+        registerDecodeResult = registerDecode(instrParts[2]); // rs
+        if (!registerDecodeResult.startsWith(Constants.errorTag))
+            bin32instr += registerDecodeResult; // rs
+        else
+            return registerDecodeResult;
+        
+        registerDecodeResult = registerDecode(instrParts[1]); // rt
+        if (!registerDecodeResult.startsWith(Constants.errorTag))
+            bin32instr += registerDecodeResult; // rt
+        else
+            return registerDecodeResult;
+        
         String immidieateField = Integer.toBinaryString(Integer.valueOf(instrParts[3])); // imm
+        
+        if (immidieateField.length() > 16)
+            return Constants.errorTag + Constants.errorImmediateIsOutOfRangeMessage;
         
         String oldString = "";
         for(int i = 0; i < 16 - immidieateField.length(); i++){
@@ -279,10 +302,26 @@ public class MIPSAssembler {
     public static String rTypeAssemble(String[] instrParts) {
         // r type format: opcode (6) rs (5) rt (5) rd (5) shamt (5) funct (6)
         String bin32instr = "000000"; // opcode
+        String registerDecodeResult;
         
-        bin32instr += registerDecode(instrParts[2]); // rs
-        bin32instr += registerDecode(instrParts[3]); // rt
-        bin32instr += registerDecode(instrParts[1]); // rd
+        registerDecodeResult = registerDecode(instrParts[2]); // rs
+        if (!registerDecodeResult.startsWith(Constants.errorTag))
+            bin32instr += registerDecodeResult; // rs
+        else
+            return registerDecodeResult;
+        
+        registerDecodeResult = registerDecode(instrParts[3]); // rt
+        if (!registerDecodeResult.startsWith(Constants.errorTag))
+            bin32instr += registerDecodeResult; // rs
+        else
+            return registerDecodeResult;
+        
+        registerDecodeResult = registerDecode(instrParts[1]); // rd
+        if (!registerDecodeResult.startsWith(Constants.errorTag))
+            bin32instr += registerDecodeResult; // rs
+        else
+            return registerDecodeResult;
+        
         //TODO LOOK FOR SHIFTING INSTRUCTIONS TO ADD TO SHAMT
         bin32instr += "00000"; //if no shifting is present
         bin32instr += lookUpTable.get(Constants.TYPE_R).get(instrParts[0]); // funct
