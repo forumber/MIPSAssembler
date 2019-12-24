@@ -270,13 +270,13 @@ public class MIPSAssembler {
         
         registerDecodeResult = registerDecode(instrParts[2]); // rs
         if (!registerDecodeResult.startsWith(Constants.errorTag))
-            bin32instr += registerDecodeResult; // rs
+            bin32instr += registerDecodeResult;
         else
             return registerDecodeResult;
         
         registerDecodeResult = registerDecode(instrParts[1]); // rt
         if (!registerDecodeResult.startsWith(Constants.errorTag))
-            bin32instr += registerDecodeResult; // rt
+            bin32instr += registerDecodeResult;
         else
             return registerDecodeResult;
         
@@ -303,19 +303,19 @@ public class MIPSAssembler {
         
         registerDecodeResult = registerDecode(instrParts[2]); // rs
         if (!registerDecodeResult.startsWith(Constants.errorTag))
-            bin32instr += registerDecodeResult; // rs
+            bin32instr += registerDecodeResult;
         else
             return registerDecodeResult;
         
         registerDecodeResult = registerDecode(instrParts[3]); // rt
         if (!registerDecodeResult.startsWith(Constants.errorTag))
-            bin32instr += registerDecodeResult; // rs
+            bin32instr += registerDecodeResult;
         else
             return registerDecodeResult;
         
         registerDecodeResult = registerDecode(instrParts[1]); // rd
         if (!registerDecodeResult.startsWith(Constants.errorTag))
-            bin32instr += registerDecodeResult; // rs
+            bin32instr += registerDecodeResult;
         else
             return registerDecodeResult;
         
