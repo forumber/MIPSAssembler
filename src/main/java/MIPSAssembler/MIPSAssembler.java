@@ -1,4 +1,4 @@
-// Test at https://csfieldguide.org.nz/en/interact  ives/mips-assembler/
+// Test at https://csfieldguide.org.nz/en/interactives/mips-assembler/
 package MIPSAssembler;
 
 
@@ -11,6 +11,7 @@ public class MIPSAssembler {
     public static Map<String, Map<String, String>> lookUpTable = new HashMap<>();
     public static Map<String, List<String>> permittedOperands = new HashMap<>();
     public static Map<String, Map<String, Integer>> customOperands = new HashMap<>();
+    public static Map<String, Integer> labelIndex = new HashMap<>();
 
     public static Scanner consoleInput = new Scanner(System.in);
 
@@ -106,7 +107,8 @@ public class MIPSAssembler {
 
     
 
-    public static String assemble(String instructionToDecode) {
+    public static String assemble(String instructionToDecode) { 
+        
         String instructionToDecodeType = "";
 
         instructionToDecode = instructionToDecode.replace(", ", " ");
@@ -146,9 +148,11 @@ public class MIPSAssembler {
     }
 
     public static List<String> assembleBatch(List<String> instructionsToDecode) {
+        findAllLabelIndexes(instructionsToDecode);
         List<String> assembledInstructionsToReturn = new ArrayList<>();
-
+            
         int lineCounter = 0;
+
 
         for (String i : instructionsToDecode) {
             String assembledInstruction = assemble(i);
@@ -357,6 +361,12 @@ public class MIPSAssembler {
             } catch (NumberFormatException ex) {
                 return Constants.errorTag + Constants.errorImmediateFieldIsNotValidMessage;
             }
+        } else if (operandDecodeOrder.get(Constants.OP_TYPE_LABEL) != 0) {
+            try {
+                immidieateField = Integer.toBinaryString(labelIndex.get(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_LABEL)])); // imm
+            } catch (NumberFormatException ex) {
+                return Constants.errorTag;//+ Constants.errorImmediateFieldIsNotValidMessage; TODO 
+            }
         }
         
         // TODO: Label adress calculation
@@ -371,7 +381,7 @@ public class MIPSAssembler {
         immidieateField = oldString + immidieateField;
         
         bin32instr += immidieateField;
-       
+        
         return bin32instr;
     }
 
@@ -453,6 +463,22 @@ public class MIPSAssembler {
         bin32instr += lookUpTable.get(Constants.TYPE_R).get(instrParts[0]); // funct
        
         return bin32instr;
+    }
+
+    public static void findAllLabelIndexes(List<String> instructionsToDecode) {
+        labelIndex.clear();
+        int instrLineCounter = 0;
+        List<String> temp = new ArrayList<>();
+        for(String instr : instructionsToDecode){
+            if(!instr.endsWith(":")) {
+                instrLineCounter++;
+                temp.add(instr);
+            }
+            else labelIndex.put(instr.replace(":",""), instrLineCounter + 1);
+        }
+        
+        for(String objectToBeRemoved: temp)
+            instructionsToDecode.remove(objectToBeRemoved);
     }
 
 }
