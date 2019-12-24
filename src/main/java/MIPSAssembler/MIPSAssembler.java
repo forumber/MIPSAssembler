@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 public class MIPSAssembler {
 
     public static Map<String, Map<String, String>> lookUpTable = new HashMap<>();
+    public static Map<String, List<String>> permittedOperands = new HashMap<>();
+    public static Map<String, Map<String, Integer>> customOperands = new HashMap<>();
 
     public static Scanner consoleInput = new Scanner(System.in);
 
@@ -31,6 +33,19 @@ public class MIPSAssembler {
         lookUpTable.put(Constants.TYPE_R, new HashMap<>());
         lookUpTable.put(Constants.TYPE_MEMORY, new HashMap<>());
         lookUpTable.put(Constants.TYPE_REGISTER, new HashMap<>());
+        
+        permittedOperands.put(Constants.TYPE_I, new ArrayList<String>() {{
+            add(Constants.OP_TYPE_IMM);
+            add(Constants.OP_TYPE_RS);
+            add(Constants.OP_TYPE_RT);
+            add(Constants.OP_TYPE_LABEL);
+        }});
+        permittedOperands.put(Constants.TYPE_R, new ArrayList<String>() {{
+            add(Constants.OP_TYPE_IMM);
+            add(Constants.OP_TYPE_RS);
+            add(Constants.OP_TYPE_RT);
+            add(Constants.OP_TYPE_RD);
+        }});
 
         while (lookUpTableFile.hasNextLine()) {
 
@@ -41,19 +56,47 @@ public class MIPSAssembler {
             if (!(nextLine.startsWith("#") || nextLine.isEmpty())) {
                 String[] theInstruction = nextLine.split(" ");
 
-                if (lookUpTable.containsKey(theInstruction[0])) {
-                    if (lookUpTable.get(theInstruction[0]).containsKey(theInstruction[1]) || lookUpTable.get(theInstruction[0]).containsValue(theInstruction[2])) {
+                if (theInstruction.length == 3 || theInstruction.length == 4) {
+                    if (lookUpTable.containsKey(theInstruction[0])) {
+                        if (lookUpTable.get(theInstruction[0]).containsKey(theInstruction[1]) || lookUpTable.get(theInstruction[0]).containsValue(theInstruction[2])) {
+                            System.err.println("");
+                            System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
+                            System.err.println("Line " + lineCounter + ": The instruction or opcode/function is already being used!");
+                            System.exit(1);
+                        } else {
+                            lookUpTable.get(theInstruction[0]).put(theInstruction[1], theInstruction[2]);
+                            if (theInstruction.length == 4)
+                            {
+                                String[] customOperandsInLookUpTable = theInstruction[3].split(",");
+                                for (String i: customOperandsInLookUpTable)
+                                    if(!permittedOperands.get(theInstruction[0]).contains(i))
+                                    {
+                                        System.err.println("");
+                                        System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
+                                        System.err.println("Line " + lineCounter + ": The custom operand " + i + " is not allowed for type " + theInstruction[0]);
+                                        System.exit(1);
+                                    }
+                                customOperands.put(theInstruction[1], new HashMap<String, Integer>() {
+                                    {
+                                        put(Constants.OP_TYPE_RD, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_RD) + 1);
+                                        put(Constants.OP_TYPE_RS, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_RS) + 1);
+                                        put(Constants.OP_TYPE_RT, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_RT) + 1);
+                                        put(Constants.OP_TYPE_IMM, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_IMM) + 1);
+                                    }
+                                });
+                            }
+                        }
+                    } else {
                         System.err.println("");
                         System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
-                        System.err.println("Line " + lineCounter + ": The instruction or opcode/function is already being used!");
+                        System.err.println("Line " + lineCounter + ": " + theInstruction[0] + " is not a valid instruction type!");
                         System.exit(1);
-                    } else {
-                        lookUpTable.get(theInstruction[0]).put(theInstruction[1], theInstruction[2]);
                     }
-                } else {
+                } else
+                {
                     System.err.println("");
                     System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
-                    System.err.println("Line " + lineCounter + ": " + theInstruction[0] + " is not a valid instruction type!");
+                    System.err.println("Line " + lineCounter + ": Entered field is not valid!");
                     System.exit(1);
                 }
             }
@@ -262,30 +305,61 @@ public class MIPSAssembler {
     }
 
     public static String iTypeAssemble(String[] instrParts) {
+        Map<String, Integer> operandDecodeOrder;
+        
+        if (!customOperands.containsKey(instrParts[0]))
+        {
+            operandDecodeOrder = new HashMap<String, Integer>() {
+                {
+                    put(Constants.OP_TYPE_RS, 2);
+                    put(Constants.OP_TYPE_RT, 1);
+                    put(Constants.OP_TYPE_IMM, 3);
+                }
+            };
+        } else {
+            operandDecodeOrder = customOperands.get(instrParts[0]);
+        }
+        
         String bin32instr = "";
-        String immidieateField = null;
+        String immidieateField = "";
         String registerDecodeResult;
         
         // i type format: opcode (6) rs (5) rt (5) immediate (16)
         bin32instr += lookUpTable.get(Constants.TYPE_I).get(instrParts[0]); // opcode
         
-        registerDecodeResult = registerDecode(instrParts[2]); // rs
-        if (!registerDecodeResult.startsWith(Constants.errorTag))
-            bin32instr += registerDecodeResult;
-        else
-            return registerDecodeResult;
-        
-        registerDecodeResult = registerDecode(instrParts[1]); // rt
-        if (!registerDecodeResult.startsWith(Constants.errorTag))
-            bin32instr += registerDecodeResult;
-        else
-            return registerDecodeResult;
-        
-        try {
-            immidieateField = Integer.toBinaryString(Integer.valueOf(instrParts[3])); // imm
-        } catch (NumberFormatException ex) {
-            return Constants.errorTag + Constants.errorImmediateFieldIsNotValidMessage;
+        if (operandDecodeOrder.get(Constants.OP_TYPE_RS) != 0) {
+            registerDecodeResult = registerDecode(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_RS)]); // rs
+            if (!registerDecodeResult.startsWith(Constants.errorTag)) {
+                bin32instr += registerDecodeResult;
+            } else {
+                return registerDecodeResult;
+            }
+        } else 
+        {
+            bin32instr += "00000";
         }
+        
+        if (operandDecodeOrder.get(Constants.OP_TYPE_RT) != 0) {
+            registerDecodeResult = registerDecode(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_RT)]); // rt
+            if (!registerDecodeResult.startsWith(Constants.errorTag)) {
+                bin32instr += registerDecodeResult;
+            } else {
+                return registerDecodeResult;
+            }
+        } else 
+        {
+            bin32instr += "00000";
+        }
+        
+        if (operandDecodeOrder.get(Constants.OP_TYPE_IMM) != 0) {
+            try {
+                immidieateField = Integer.toBinaryString(Integer.valueOf(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_IMM)])); // imm
+            } catch (NumberFormatException ex) {
+                return Constants.errorTag + Constants.errorImmediateFieldIsNotValidMessage;
+            }
+        }
+        
+        // TODO: Label adress calculation
         
         if (immidieateField.length() > 16)
             return Constants.errorTag + Constants.errorImmediateIsOutOfRangeMessage;
@@ -302,30 +376,80 @@ public class MIPSAssembler {
     }
 
     public static String rTypeAssemble(String[] instrParts) {
+        Map<String, Integer> operandDecodeOrder;
+        
+        if (!customOperands.containsKey(instrParts[0]))
+        {
+            operandDecodeOrder = new HashMap<String, Integer>() {
+                {
+                    put(Constants.OP_TYPE_RS, 2);
+                    put(Constants.OP_TYPE_RT, 3);
+                    put(Constants.OP_TYPE_RD, 1);
+                }
+            };
+        } else {
+            operandDecodeOrder = customOperands.get(instrParts[0]);
+        }
+        
         // r type format: opcode (6) rs (5) rt (5) rd (5) shamt (5) funct (6)
         String bin32instr = "000000"; // opcode
         String registerDecodeResult;
+        String shiftAmount = "00000";
         
-        registerDecodeResult = registerDecode(instrParts[2]); // rs
-        if (!registerDecodeResult.startsWith(Constants.errorTag))
-            bin32instr += registerDecodeResult;
-        else
-            return registerDecodeResult;
+        if (operandDecodeOrder.get(Constants.OP_TYPE_RS) != 0) {
+            registerDecodeResult = registerDecode(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_RS)]); // rs
+            if (!registerDecodeResult.startsWith(Constants.errorTag)) {
+                bin32instr += registerDecodeResult;
+            } else {
+                return registerDecodeResult;
+            }
+        } else 
+        {
+            bin32instr += "00000";
+        }
         
-        registerDecodeResult = registerDecode(instrParts[3]); // rt
-        if (!registerDecodeResult.startsWith(Constants.errorTag))
-            bin32instr += registerDecodeResult;
-        else
-            return registerDecodeResult;
+        if (operandDecodeOrder.get(Constants.OP_TYPE_RT) != 0) {
+            registerDecodeResult = registerDecode(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_RT)]); // rt
+            if (!registerDecodeResult.startsWith(Constants.errorTag)) {
+                bin32instr += registerDecodeResult;
+            } else {
+                return registerDecodeResult;
+            }
+        } else 
+        {
+            bin32instr += "00000";
+        }
         
-        registerDecodeResult = registerDecode(instrParts[1]); // rd
-        if (!registerDecodeResult.startsWith(Constants.errorTag))
-            bin32instr += registerDecodeResult;
-        else
-            return registerDecodeResult;
+        if (operandDecodeOrder.get(Constants.OP_TYPE_RD) != 0) {
+            registerDecodeResult = registerDecode(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_RD)]); // rd
+            if (!registerDecodeResult.startsWith(Constants.errorTag)) {
+                bin32instr += registerDecodeResult;
+            } else {
+                return registerDecodeResult;
+            }
+        } else 
+        {
+            bin32instr += "00000";
+        }
         
-        //TODO LOOK FOR SHIFTING INSTRUCTIONS TO ADD TO SHAMT
-        bin32instr += "00000"; //if no shifting is present
+        if (operandDecodeOrder.get(Constants.OP_TYPE_IMM) != 0) {
+            try {
+                shiftAmount = Integer.toBinaryString(Integer.valueOf(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_IMM)])); // imm
+            } catch (NumberFormatException ex) {
+                return Constants.errorTag + Constants.errorImmediateFieldIsNotValidMessage;
+            }
+        }
+        
+        if (shiftAmount.length() > 5)
+            return Constants.errorTag + Constants.errorImmediateIsOutOfRangeMessage;
+        
+        String oldString = "";
+        for(int i = 0; i < 5 - shiftAmount.length(); i++){
+            oldString += "0";
+        }
+        shiftAmount = oldString + shiftAmount;
+        
+        bin32instr += shiftAmount;
         bin32instr += lookUpTable.get(Constants.TYPE_R).get(instrParts[0]); // funct
        
         return bin32instr;

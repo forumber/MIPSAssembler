@@ -1,5 +1,8 @@
 package MIPSAssembler;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Constants {
 
     public static final String TYPE_R = "r";
@@ -7,6 +10,12 @@ public class Constants {
     public static final String TYPE_J = "j";
     public static final String TYPE_REGISTER = "register";
     public static final String TYPE_MEMORY = "memory";
+    
+    public static final String OP_TYPE_RS = "rs";
+    public static final String OP_TYPE_RT = "rt";
+    public static final String OP_TYPE_RD = "rd";
+    public static final String OP_TYPE_IMM = "imm";
+    public static final String OP_TYPE_LABEL = "label";
 
     public static final String lookUpTableFileName = "lookUpTable.txt";
     public static final long firstMIPSMemoryLocation = 0x8000100L; // given in PDF

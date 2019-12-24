@@ -1,4 +1,8 @@
-#R type 
+#R type
+# default operand format order:
+# rd,rs,rt
+# permitted operand formats to override the order:
+# rd - rs - rt - imm
 r add 100000
 r addu 100001
 r and 100100
@@ -6,17 +10,21 @@ r sub 100010
 r or 100101
 r nor 100111
 r xor 100110
-r sll 000000
-r srl 000010
+r sll 000000 rd,rt,imm
+r srl 000010 rd,rt,imm
 r slt 101010
 r sltu 101011
-r sra 000011
+r sra 000011 rd,rt,imm
 
 #I type
+# default operand format order:
+# rt,rs,imm
+# permitted operand formats to override the order:
+# rs - rt - imm - label
 i slti 001010
 i sltiu 001011
-i beq 000100
-i bne 000101
+i beq 000100 rs,rt,label
+i bne 000101 rs,rt,label
 i addi 001000
 i andi 001100
 i ori 001101
@@ -33,7 +41,7 @@ memory lbu 100100
 memory sb 101000
 memory lui 001111
 
-#j type 
+#j type
 j j 000010
 j jal 000011
 j jr 001000
