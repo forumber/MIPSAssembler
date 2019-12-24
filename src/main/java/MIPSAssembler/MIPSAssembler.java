@@ -330,7 +330,7 @@ public class MIPSAssembler {
         }
 
         String bin32instr = "";
-        String immidieateField = "";
+        String immediateField = "";
         String registerDecodeResult;
 
         // i type format: opcode (6) rs (5) rt (5) immediate (16)
@@ -360,33 +360,33 @@ public class MIPSAssembler {
 
         if (operandDecodeOrder.get(Constants.OP_TYPE_IMM) != 0) {
             try {
-                immidieateField = Integer.toBinaryString(Integer.valueOf(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_IMM)])); // imm
+                immediateField = Integer.toBinaryString(Integer.valueOf(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_IMM)])); // imm
             } catch (NumberFormatException ex) {
                 return Constants.errorTag + Constants.errorImmediateFieldIsNotValidMessage;
             }
         } else if (operandDecodeOrder.get(Constants.OP_TYPE_LABEL) != 0) {
             try {
-                immidieateField = Integer.toBinaryString(labelIndex.get(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_LABEL)]) - currentInstrLine); // imm
+                immediateField = Integer.toBinaryString(labelIndex.get(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_LABEL)]) - currentInstrLine); // imm
             } catch (Exception ex) {
                 return Constants.errorTag + Constants.errorLabelNotFoundMessage;
             }
         }
 
-        if (immidieateField.length() > 16 && operandDecodeOrder.get(Constants.OP_TYPE_IMM) != 0) {
+        if (immediateField.length() > 16 && operandDecodeOrder.get(Constants.OP_TYPE_IMM) != 0) {
             return Constants.errorTag + Constants.errorImmediateIsOutOfRangeMessage;
         }
 
-        if (immidieateField.length() > 16 && operandDecodeOrder.get(Constants.OP_TYPE_LABEL) != 0) {
-            immidieateField = immidieateField.substring(16);
+        if (immediateField.length() > 16 && operandDecodeOrder.get(Constants.OP_TYPE_LABEL) != 0) {
+            immediateField = immediateField.substring(16);
         }
 
         String oldString = "";
-        for (int i = 0; i < 16 - immidieateField.length(); i++) {
+        for (int i = 0; i < 16 - immediateField.length(); i++) {
             oldString += "0";
         }
-        immidieateField = oldString + immidieateField;
+        immediateField = oldString + immediateField;
 
-        bin32instr += immidieateField;
+        bin32instr += immediateField;
 
         return bin32instr;
     }
