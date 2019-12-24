@@ -1,7 +1,6 @@
 // Test at https://csfieldguide.org.nz/en/interactives/mips-assembler/
 package MIPSAssembler;
 
-
 import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
@@ -34,23 +33,29 @@ public class MIPSAssembler {
         lookUpTable.put(Constants.TYPE_R, new HashMap<>());
         lookUpTable.put(Constants.TYPE_MEMORY, new HashMap<>());
         lookUpTable.put(Constants.TYPE_REGISTER, new HashMap<>());
-        
-        permittedOperands.put(Constants.TYPE_I, new ArrayList<String>() {{
-            add(Constants.OP_TYPE_IMM);
-            add(Constants.OP_TYPE_RS);
-            add(Constants.OP_TYPE_RT);
-            add(Constants.OP_TYPE_LABEL);
-        }});
-        permittedOperands.put(Constants.TYPE_R, new ArrayList<String>() {{
-            add(Constants.OP_TYPE_IMM);
-            add(Constants.OP_TYPE_RS);
-            add(Constants.OP_TYPE_RT);
-            add(Constants.OP_TYPE_RD);
-        }});
+
+        permittedOperands.put(Constants.TYPE_I, new ArrayList<String>() {
+            {
+                add(Constants.OP_TYPE_IMM);
+                add(Constants.OP_TYPE_RS);
+                add(Constants.OP_TYPE_RT);
+                add(Constants.OP_TYPE_LABEL);
+            }
+        });
+        permittedOperands.put(Constants.TYPE_R, new ArrayList<String>() {
+            {
+                add(Constants.OP_TYPE_IMM);
+                add(Constants.OP_TYPE_RS);
+                add(Constants.OP_TYPE_RT);
+                add(Constants.OP_TYPE_RD);
+            }
+        });
 
         while (lookUpTableFile.hasNextLine()) {
 
             String nextLine = lookUpTableFile.nextLine();
+            if (nextLine.contains("#") && !nextLine.startsWith("#"))
+                nextLine = nextLine.substring(0, nextLine.indexOf("#"));
             lineCounter++;
 
             // TODO: Change theInstruction variable name
@@ -66,26 +71,32 @@ public class MIPSAssembler {
                             System.exit(1);
                         } else {
                             lookUpTable.get(theInstruction[0]).put(theInstruction[1], theInstruction[2]);
-                            if (theInstruction.length == 4)
-                            {
-                                String[] customOperandsInLookUpTable = theInstruction[3].split(",");
-                                for (String i: customOperandsInLookUpTable)
-                                    if(!permittedOperands.get(theInstruction[0]).contains(i))
-                                    {
-                                        System.err.println("");
-                                        System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
-                                        System.err.println("Line " + lineCounter + ": The custom operand " + i + " is not allowed for type " + theInstruction[0]);
-                                        System.exit(1);
+                            if (theInstruction.length == 4) {
+                                try {
+                                    String[] customOperandsInLookUpTable = theInstruction[3].split(",");
+                                    for (String i : customOperandsInLookUpTable) {
+                                        if (!permittedOperands.get(theInstruction[0]).contains(i)) {
+                                            System.err.println("");
+                                            System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
+                                            System.err.println("Line " + lineCounter + ": The custom operand " + i + " is not allowed for type " + theInstruction[0]);
+                                            System.exit(1);
+                                        }
                                     }
-                                customOperands.put(theInstruction[1], new HashMap<String, Integer>() {
-                                    {
-                                        put(Constants.OP_TYPE_RD, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_RD) + 1);
-                                        put(Constants.OP_TYPE_RS, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_RS) + 1);
-                                        put(Constants.OP_TYPE_RT, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_RT) + 1);
-                                        put(Constants.OP_TYPE_IMM, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_IMM) + 1);
-                                        put(Constants.OP_TYPE_LABEL, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_LABEL) + 1);
-                                    }
-                                });
+                                    customOperands.put(theInstruction[1], new HashMap<String, Integer>() {
+                                        {
+                                            put(Constants.OP_TYPE_RD, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_RD) + 1);
+                                            put(Constants.OP_TYPE_RS, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_RS) + 1);
+                                            put(Constants.OP_TYPE_RT, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_RT) + 1);
+                                            put(Constants.OP_TYPE_IMM, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_IMM) + 1);
+                                            put(Constants.OP_TYPE_LABEL, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_LABEL) + 1);
+                                        }
+                                    });
+                                } catch (Exception e) {
+                                    System.err.println("");
+                                    System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
+                                    System.err.println("Line " + lineCounter + ": Custom operands are not allowed for type: " + theInstruction[0]);
+                                    System.exit(1);
+                                }
                             }
                         }
                     } else {
@@ -94,8 +105,7 @@ public class MIPSAssembler {
                         System.err.println("Line " + lineCounter + ": " + theInstruction[0] + " is not a valid instruction type!");
                         System.exit(1);
                     }
-                } else
-                {
+                } else {
                     System.err.println("");
                     System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
                     System.err.println("Line " + lineCounter + ": Entered field is not valid!");
@@ -106,10 +116,8 @@ public class MIPSAssembler {
         lookUpTableFile.close();
     }
 
-    
+    public static String assemble(String instructionToDecode, int currentInstrLine) {
 
-    public static String assemble(String instructionToDecode, int currentInstrLine) { 
-        
         String instructionToDecodeType = "";
 
         instructionToDecode = instructionToDecode.replace(", ", " ");
@@ -152,7 +160,7 @@ public class MIPSAssembler {
         List<String> labellessInstructionsToDecode = findAllLabelIndexes(instructionsToDecode);
         List<String> assembledInstructionsToReturn = new ArrayList<>();
         int instructionLineCounter = 0;
-        
+
         for (String i : labellessInstructionsToDecode) {
             String assembledInstruction = assemble(i, instructionLineCounter);
             instructionLineCounter++;
@@ -161,7 +169,7 @@ public class MIPSAssembler {
                 System.err.println("An error has occurred while assembling the instruction");
                 System.err.println("Line " + (instructionsToDecode.indexOf(i) + 1) + ": " + assembledInstruction.replace(Constants.errorTag, ""));
                 return null;
-            }else{
+            } else {
                 assembledInstructionsToReturn.add(assembledInstruction);
             }
         }
@@ -307,9 +315,8 @@ public class MIPSAssembler {
 
     public static String iTypeAssemble(String[] instrParts, int currentInstrLine) {
         Map<String, Integer> operandDecodeOrder;
-        
-        if (!customOperands.containsKey(instrParts[0]))
-        {
+
+        if (!customOperands.containsKey(instrParts[0])) {
             operandDecodeOrder = new HashMap<String, Integer>() {
                 {
                     put(Constants.OP_TYPE_RS, 2);
@@ -321,14 +328,14 @@ public class MIPSAssembler {
         } else {
             operandDecodeOrder = customOperands.get(instrParts[0]);
         }
-        
+
         String bin32instr = "";
         String immidieateField = "";
         String registerDecodeResult;
-        
+
         // i type format: opcode (6) rs (5) rt (5) immediate (16)
         bin32instr += lookUpTable.get(Constants.TYPE_I).get(instrParts[0]); // opcode
-        
+
         if (operandDecodeOrder.get(Constants.OP_TYPE_RS) != 0) {
             registerDecodeResult = registerDecode(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_RS)]); // rs
             if (!registerDecodeResult.startsWith(Constants.errorTag)) {
@@ -336,11 +343,10 @@ public class MIPSAssembler {
             } else {
                 return registerDecodeResult;
             }
-        } else 
-        {
+        } else {
             bin32instr += "00000";
         }
-        
+
         if (operandDecodeOrder.get(Constants.OP_TYPE_RT) != 0) {
             registerDecodeResult = registerDecode(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_RT)]); // rt
             if (!registerDecodeResult.startsWith(Constants.errorTag)) {
@@ -348,11 +354,10 @@ public class MIPSAssembler {
             } else {
                 return registerDecodeResult;
             }
-        } else 
-        {
+        } else {
             bin32instr += "00000";
         }
-        
+
         if (operandDecodeOrder.get(Constants.OP_TYPE_IMM) != 0) {
             try {
                 immidieateField = Integer.toBinaryString(Integer.valueOf(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_IMM)])); // imm
@@ -366,29 +371,30 @@ public class MIPSAssembler {
                 return Constants.errorTag + Constants.errorLabelNotFoundMessage;
             }
         }
-        
-        if (immidieateField.length() > 16 && operandDecodeOrder.get(Constants.OP_TYPE_IMM) != 0)
+
+        if (immidieateField.length() > 16 && operandDecodeOrder.get(Constants.OP_TYPE_IMM) != 0) {
             return Constants.errorTag + Constants.errorImmediateIsOutOfRangeMessage;
-        
-        if (immidieateField.length() > 16 && operandDecodeOrder.get(Constants.OP_TYPE_LABEL) != 0)
+        }
+
+        if (immidieateField.length() > 16 && operandDecodeOrder.get(Constants.OP_TYPE_LABEL) != 0) {
             immidieateField = immidieateField.substring(16);
-        
+        }
+
         String oldString = "";
-        for(int i = 0; i < 16 - immidieateField.length(); i++){
+        for (int i = 0; i < 16 - immidieateField.length(); i++) {
             oldString += "0";
         }
         immidieateField = oldString + immidieateField;
-        
+
         bin32instr += immidieateField;
-        
+
         return bin32instr;
     }
 
     public static String rTypeAssemble(String[] instrParts) {
         Map<String, Integer> operandDecodeOrder;
-        
-        if (!customOperands.containsKey(instrParts[0]))
-        {
+
+        if (!customOperands.containsKey(instrParts[0])) {
             operandDecodeOrder = new HashMap<String, Integer>() {
                 {
                     put(Constants.OP_TYPE_RS, 2);
@@ -400,12 +406,12 @@ public class MIPSAssembler {
         } else {
             operandDecodeOrder = customOperands.get(instrParts[0]);
         }
-        
+
         // r type format: opcode (6) rs (5) rt (5) rd (5) shamt (5) funct (6)
         String bin32instr = "000000"; // opcode
         String registerDecodeResult;
         String shiftAmount = "00000";
-        
+
         if (operandDecodeOrder.get(Constants.OP_TYPE_RS) != 0) {
             registerDecodeResult = registerDecode(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_RS)]); // rs
             if (!registerDecodeResult.startsWith(Constants.errorTag)) {
@@ -413,11 +419,10 @@ public class MIPSAssembler {
             } else {
                 return registerDecodeResult;
             }
-        } else 
-        {
+        } else {
             bin32instr += "00000";
         }
-        
+
         if (operandDecodeOrder.get(Constants.OP_TYPE_RT) != 0) {
             registerDecodeResult = registerDecode(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_RT)]); // rt
             if (!registerDecodeResult.startsWith(Constants.errorTag)) {
@@ -425,11 +430,10 @@ public class MIPSAssembler {
             } else {
                 return registerDecodeResult;
             }
-        } else 
-        {
+        } else {
             bin32instr += "00000";
         }
-        
+
         if (operandDecodeOrder.get(Constants.OP_TYPE_RD) != 0) {
             registerDecodeResult = registerDecode(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_RD)]); // rd
             if (!registerDecodeResult.startsWith(Constants.errorTag)) {
@@ -437,11 +441,10 @@ public class MIPSAssembler {
             } else {
                 return registerDecodeResult;
             }
-        } else 
-        {
+        } else {
             bin32instr += "00000";
         }
-        
+
         if (operandDecodeOrder.get(Constants.OP_TYPE_IMM) != 0) {
             try {
                 shiftAmount = Integer.toBinaryString(Integer.valueOf(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_IMM)])); // imm
@@ -449,19 +452,20 @@ public class MIPSAssembler {
                 return Constants.errorTag + Constants.errorImmediateFieldIsNotValidMessage;
             }
         }
-        
-        if (shiftAmount.length() > 5)
+
+        if (shiftAmount.length() > 5) {
             return Constants.errorTag + Constants.errorImmediateIsOutOfRangeMessage;
-        
+        }
+
         String oldString = "";
-        for(int i = 0; i < 5 - shiftAmount.length(); i++){
+        for (int i = 0; i < 5 - shiftAmount.length(); i++) {
             oldString += "0";
         }
         shiftAmount = oldString + shiftAmount;
-        
+
         bin32instr += shiftAmount;
         bin32instr += lookUpTable.get(Constants.TYPE_R).get(instrParts[0]); // funct
-       
+
         return bin32instr;
     }
 
@@ -469,17 +473,15 @@ public class MIPSAssembler {
         labelIndex.clear();
         int instrLineCounter = 0;
         List<String> temp = new ArrayList<>();
-        for(String instr : instructionsToDecode){
-            if(!instr.endsWith(":")) {
+        for (String instr : instructionsToDecode) {
+            if (!instr.endsWith(":")) {
                 instrLineCounter++;
                 temp.add(instr);
-            }
-            else
-            {
-                labelIndex.put(instr.replace(":",""), instrLineCounter);
+            } else {
+                labelIndex.put(instr.replace(":", ""), instrLineCounter);
             }
         }
-        
+
         return temp;
     }
 
