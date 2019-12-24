@@ -83,6 +83,7 @@ public class MIPSAssembler {
                                         put(Constants.OP_TYPE_RS, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_RS) + 1);
                                         put(Constants.OP_TYPE_RT, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_RT) + 1);
                                         put(Constants.OP_TYPE_IMM, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_IMM) + 1);
+                                        put(Constants.OP_TYPE_LABEL, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_LABEL) + 1);
                                     }
                                 });
                             }
@@ -107,7 +108,7 @@ public class MIPSAssembler {
 
     
 
-    public static String assemble(String instructionToDecode) { 
+    public static String assemble(String instructionToDecode, int currentInstrLine) { 
         
         String instructionToDecodeType = "";
 
@@ -130,7 +131,7 @@ public class MIPSAssembler {
 
         switch (instructionToDecodeType) {
             case Constants.TYPE_I:
-                return iTypeAssemble(instrParts);
+                return iTypeAssemble(instrParts, currentInstrLine);
             case Constants.TYPE_R:
                 return rTypeAssemble(instrParts);
 
@@ -148,19 +149,17 @@ public class MIPSAssembler {
     }
 
     public static List<String> assembleBatch(List<String> instructionsToDecode) {
-        findAllLabelIndexes(instructionsToDecode);
+        List<String> labellessInstructionsToDecode = findAllLabelIndexes(instructionsToDecode);
         List<String> assembledInstructionsToReturn = new ArrayList<>();
-            
-        int lineCounter = 0;
-
-
-        for (String i : instructionsToDecode) {
-            String assembledInstruction = assemble(i);
-            lineCounter++;
+        int instructionLineCounter = 0;
+        
+        for (String i : labellessInstructionsToDecode) {
+            String assembledInstruction = assemble(i, instructionLineCounter);
+            instructionLineCounter++;
             if (assembledInstruction.startsWith(Constants.errorTag)) {
                 System.err.println("");
                 System.err.println("An error has occurred while assembling the instruction");
-                System.err.println("Line " + lineCounter + ": " + assembledInstruction.replace(Constants.errorTag, ""));
+                System.err.println("Line " + (instructionsToDecode.indexOf(i) + 1) + ": " + assembledInstruction.replace(Constants.errorTag, ""));
                 return null;
             }else{
                 assembledInstructionsToReturn.add(assembledInstruction);
@@ -277,8 +276,6 @@ public class MIPSAssembler {
             System.exit(1);
         }
 
-        printLookUpTable();
-
         while (true) {
             System.out.println("");
             System.out.println("Java MIPS Assembler");
@@ -308,7 +305,7 @@ public class MIPSAssembler {
         }
     }
 
-    public static String iTypeAssemble(String[] instrParts) {
+    public static String iTypeAssemble(String[] instrParts, int currentInstrLine) {
         Map<String, Integer> operandDecodeOrder;
         
         if (!customOperands.containsKey(instrParts[0]))
@@ -318,6 +315,7 @@ public class MIPSAssembler {
                     put(Constants.OP_TYPE_RS, 2);
                     put(Constants.OP_TYPE_RT, 1);
                     put(Constants.OP_TYPE_IMM, 3);
+                    put(Constants.OP_TYPE_LABEL, 0);
                 }
             };
         } else {
@@ -363,7 +361,7 @@ public class MIPSAssembler {
             }
         } else if (operandDecodeOrder.get(Constants.OP_TYPE_LABEL) != 0) {
             try {
-                immidieateField = Integer.toBinaryString(labelIndex.get(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_LABEL)])); // imm
+                immidieateField = Integer.toBinaryString(labelIndex.get(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_LABEL)]) - currentInstrLine); // imm
             } catch (NumberFormatException ex) {
                 return Constants.errorTag;//+ Constants.errorImmediateFieldIsNotValidMessage; TODO 
             }
@@ -371,8 +369,11 @@ public class MIPSAssembler {
         
         // TODO: Label adress calculation
         
-        if (immidieateField.length() > 16)
+        if (immidieateField.length() > 16 && operandDecodeOrder.get(Constants.OP_TYPE_IMM) != 0)
             return Constants.errorTag + Constants.errorImmediateIsOutOfRangeMessage;
+        
+        if (immidieateField.length() > 16 && operandDecodeOrder.get(Constants.OP_TYPE_LABEL) != 0)
+            immidieateField = immidieateField.substring(16);
         
         String oldString = "";
         for(int i = 0; i < 16 - immidieateField.length(); i++){
@@ -395,6 +396,7 @@ public class MIPSAssembler {
                     put(Constants.OP_TYPE_RS, 2);
                     put(Constants.OP_TYPE_RT, 3);
                     put(Constants.OP_TYPE_RD, 1);
+                    put(Constants.OP_TYPE_IMM, 0);
                 }
             };
         } else {
@@ -465,7 +467,7 @@ public class MIPSAssembler {
         return bin32instr;
     }
 
-    public static void findAllLabelIndexes(List<String> instructionsToDecode) {
+    public static List<String> findAllLabelIndexes(List<String> instructionsToDecode) {
         labelIndex.clear();
         int instrLineCounter = 0;
         List<String> temp = new ArrayList<>();
@@ -474,11 +476,13 @@ public class MIPSAssembler {
                 instrLineCounter++;
                 temp.add(instr);
             }
-            else labelIndex.put(instr.replace(":",""), instrLineCounter + 1);
+            else
+            {
+                labelIndex.put(instr.replace(":",""), instrLineCounter);
+            }
         }
         
-        for(String objectToBeRemoved: temp)
-            instructionsToDecode.remove(objectToBeRemoved);
+        return temp;
     }
 
 }
