@@ -367,8 +367,6 @@ public class MIPSAssembler {
             }
         }
         
-        // TODO: Label adress calculation
-        
         if (immidieateField.length() > 16 && operandDecodeOrder.get(Constants.OP_TYPE_IMM) != 0)
             return Constants.errorTag + Constants.errorImmediateIsOutOfRangeMessage;
         
