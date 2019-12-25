@@ -494,11 +494,11 @@ public class MIPSAssembler {
         List<String> temp = new ArrayList<>();
         for (String instr : instructionsToDecode) {
             if (instr.endsWith(":")) {
-                long theLabelAddress = Constants.firstMIPSMemoryLocation + 4 * instrLineCounter;
+                long theLabelAddress = Constants.firstMIPSMemoryLocation + (4 * instrLineCounter);
                 labelIndex.put(instr.replace(":", ""), instrLineCounter);
                 labelAddress.put(instr.replace(":", ""), theLabelAddress);
             } else if (instr.contains(":")) {
-                long theLabelAddress = Constants.firstMIPSMemoryLocation + 4 * instrLineCounter;
+                long theLabelAddress = Constants.firstMIPSMemoryLocation + (4 * instrLineCounter);
                 labelIndex.put(instr.substring(0, instr.indexOf(":")), instrLineCounter);
                 labelAddress.put(instr.substring(0, instr.indexOf(":")), theLabelAddress);
                 
@@ -519,7 +519,7 @@ public class MIPSAssembler {
     public static String jTypeAssemble(String[] instrParts) {
         return lookUpTable.get(Constants.TYPE_J).get(instrParts[0])
                 + Long.toBinaryString(Long.parseLong(Long.toHexString(labelAddress.get(instrParts[1])), 16))
-                        .substring(6);
+                        .substring(4, 30);
     }
 
     public static String memoryTypeAssemble(String[] instrParts) {
