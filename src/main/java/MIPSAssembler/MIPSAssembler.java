@@ -180,17 +180,20 @@ public class MIPSAssembler {
         int instructionLineCounter = 0;
         long PC = Constants.firstMIPSMemoryLocation;
         for (String i : labellessInstructionsToDecode) {
-            String assembledInstruction = assemble(i, instructionLineCounter, PC);
-            instructionLineCounter++;
-            PC += 4;
-            if (assembledInstruction.startsWith(Constants.errorTag)) {
-                System.err.println("");
-                System.err.println("An error has occurred while assembling the instruction");
-                System.err.println("Line " + (instructionsToDecode.indexOf(i) + 1) + ": " + assembledInstruction.replace(Constants.errorTag, ""));
-                return null;
-            } else {
-                assembledInstructionsAsBinary.add(assembledInstruction);
+            if (!i.isEmpty()) {
+                String assembledInstruction = assemble(i, instructionLineCounter, PC);
+                instructionLineCounter++;
+                PC += 4;
+                if (assembledInstruction.startsWith(Constants.errorTag)) {
+                    System.err.println("");
+                    System.err.println("An error has occurred while assembling the instruction");
+                    System.err.println("Line " + (instructionsToDecode.indexOf(i) + 1) + ": " + assembledInstruction.replace(Constants.errorTag, ""));
+                    return null;
+                } else {
+                    assembledInstructionsAsBinary.add(assembledInstruction);
+                }
             }
+
         }
         
         List<String> assembledAsHex = new ArrayList<>();
