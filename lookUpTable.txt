@@ -15,6 +15,7 @@ r srl 000010 rd,rt,imm
 r slt 101010
 r sltu 101011
 r sra 000011 rd,rt,imm
+r jr 001000 rs
 
 #I type
 # default operand format order:
@@ -39,12 +40,10 @@ memory sh 101001
 memory lb 100000
 memory lbu 100100
 memory sb 101000
-memory lui 001111
 
 #j type
 j j 000010
 j jal 000011
-j jr 001000
 
 #registers
 register $zero 00000
