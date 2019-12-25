@@ -156,25 +156,24 @@ public class MIPSAssembler {
         }
 
     }
-    
-    public static List<String> removeBlanksAtTheBeginning(List<String> stringList)
-    {
-        List <String> toReturn = new ArrayList<>();
-        
-        for (String i: stringList)
-        {
-            while (i.startsWith(String.valueOf((char)32)) || i.startsWith(String.valueOf((char)9)))
+
+    public static List<String> removeBlanksAtTheBeginning(List<String> stringList) {
+        List<String> toReturn = new ArrayList<>();
+
+        for (String i : stringList) {
+            while (i.startsWith(String.valueOf((char) 32)) || i.startsWith(String.valueOf((char) 9))) {
                 i = i.substring(1);
-            
+            }
+
             toReturn.add(i);
         }
-        
+
         return toReturn;
     }
 
     public static List<String> assembleBatch(List<String> instructionsToDecode) {
         instructionsToDecode = removeBlanksAtTheBeginning(instructionsToDecode);
-        
+
         List<String> labellessInstructionsToDecode = findAllLabelIndexes(instructionsToDecode);
         List<String> assembledInstructionsAsBinary = new ArrayList<>();
         int instructionLineCounter = 0;
@@ -195,7 +194,7 @@ public class MIPSAssembler {
             }
 
         }
-        
+
         List<String> assembledAsHex = new ArrayList<>();
 
         for (String toConvert : assembledInstructionsAsBinary) {
@@ -205,10 +204,9 @@ public class MIPSAssembler {
                 oldString += "0";
             }
             temp = oldString + temp;
-            
+
             assembledAsHex.add(temp);
         }
-            
 
         return assembledAsHex;
     }
@@ -518,11 +516,12 @@ public class MIPSAssembler {
                 long theLabelAddress = Constants.firstMIPSMemoryLocation + (4 * instrLineCounter);
                 labelIndex.put(instr.substring(0, instr.indexOf(":")), instrLineCounter);
                 labelAddress.put(instr.substring(0, instr.indexOf(":")), theLabelAddress);
-                
+
                 instrLineCounter++;
                 String tempString = instr.substring(instr.indexOf(":") + 1);
-                while (tempString.startsWith(" "))
+                while (tempString.startsWith(" ")) {
                     tempString = tempString.substring(1);
+                }
                 temp.add(tempString);
             } else {
                 instrLineCounter++;
@@ -534,25 +533,32 @@ public class MIPSAssembler {
     }
 
     public static String jTypeAssemble(String[] instrParts) {
+        String temp = Long.toBinaryString(Long.parseLong(Long.toHexString(labelAddress.get(instrParts[1])), 16));
+
+        String oldString = "";
+        for (int i = 0; i < 32 - temp.length(); i++) {
+            oldString += "0";
+        }
+        temp = oldString + temp;
+
         return lookUpTable.get(Constants.TYPE_J).get(instrParts[0])
-                + Long.toBinaryString(Long.parseLong(Long.toHexString(labelAddress.get(instrParts[1])), 16))
-                        .substring(4, 30);
+                + temp.substring(4, 30);
     }
 
     public static String memoryTypeAssemble(String[] instrParts) {
         String theMemoryAndOffset = instrParts[2];
         theMemoryAndOffset = theMemoryAndOffset.replace("(", " ");
         theMemoryAndOffset = theMemoryAndOffset.replace(")", "");
-        
+
         List<String> tempInstrPartsList = new LinkedList<String>(Arrays.asList(instrParts));
         tempInstrPartsList.remove(2);
-        
+
         String[] theMemoryAndOffsetArray = theMemoryAndOffset.split(" ");
         tempInstrPartsList.add(theMemoryAndOffsetArray[0]);
         tempInstrPartsList.add(theMemoryAndOffsetArray[1]);
-        
+
         instrParts = tempInstrPartsList.toArray(new String[tempInstrPartsList.size()]);
-        
+
         String immediateField = Integer.toBinaryString(Integer.valueOf(instrParts[2]));
         String oldString = "";
         for (int i = 0; i < 16 - immediateField.length(); i++) {
