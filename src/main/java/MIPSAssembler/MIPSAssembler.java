@@ -156,8 +156,25 @@ public class MIPSAssembler {
         }
 
     }
+    
+    public static List<String> removeBlanksAtTheBeginning(List<String> stringList)
+    {
+        List <String> toReturn = new ArrayList<>();
+        
+        for (String i: stringList)
+        {
+            while (i.startsWith(String.valueOf((char)32)) || i.startsWith(String.valueOf((char)9)))
+                i = i.substring(1);
+            
+            toReturn.add(i);
+        }
+        
+        return toReturn;
+    }
 
     public static List<String> assembleBatch(List<String> instructionsToDecode) {
+        instructionsToDecode = removeBlanksAtTheBeginning(instructionsToDecode);
+        
         List<String> labellessInstructionsToDecode = findAllLabelIndexes(instructionsToDecode);
         List<String> assembledInstructionsToReturn = new ArrayList<>();
         int instructionLineCounter = 0;
