@@ -176,7 +176,7 @@ public class MIPSAssembler {
         instructionsToDecode = removeBlanksAtTheBeginning(instructionsToDecode);
         
         List<String> labellessInstructionsToDecode = findAllLabelIndexes(instructionsToDecode);
-        List<String> assembledInstructionsToReturn = new ArrayList<>();
+        List<String> assembledInstructionsAsBinary = new ArrayList<>();
         int instructionLineCounter = 0;
         long PC = Constants.firstMIPSMemoryLocation;
         for (String i : labellessInstructionsToDecode) {
@@ -189,11 +189,25 @@ public class MIPSAssembler {
                 System.err.println("Line " + (instructionsToDecode.indexOf(i) + 1) + ": " + assembledInstruction.replace(Constants.errorTag, ""));
                 return null;
             } else {
-                assembledInstructionsToReturn.add(assembledInstruction);
+                assembledInstructionsAsBinary.add(assembledInstruction);
             }
         }
+        
+        List<String> assembledAsHex = new ArrayList<>();
 
-        return assembledInstructionsToReturn;
+        for (String toConvert : assembledInstructionsAsBinary) {
+            String temp = Long.toHexString(Long.parseLong(toConvert, 2));
+            String oldString = "";
+            for (int i = 0; i < 8 - temp.length(); i++) {
+                oldString += "0";
+            }
+            temp = oldString + temp;
+            
+            assembledAsHex.add(temp);
+        }
+            
+
+        return assembledAsHex;
     }
 
     public static void batchMode() {
