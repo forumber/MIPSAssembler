@@ -1,9 +1,802 @@
-main: beq $s1, $s2, main
-	  beq $s1, $s2, main
-	  add $s1, $s2, $s3
-	  beq $s1, $s2, test
-	  add $s1, $s2, $s3
-	  add $s1, $s2, $s3
-test: add $s1, $s2, $s3
-	  add $s1, $s2, $s3
-	  beq $s1, $s2, test
+jal label497
+andi $t9, $s0, 4337
+addu $a0, $a0, $t0
+
+label15:
+lb $t0, 32($fp)
+slti $ra, $t2, 3341
+lh $s7, 20($s3)
+
+label119:
+jr $s1
+sltiu $gp, $fp, 12344
+j label369
+
+label114:
+lh $a1, 20($s6)
+j label33
+sb $a1, 12($k1)
+
+label133:
+addi $t3, $a2, 2208
+j label234
+jal label76
+
+label433:
+j label414
+sltiu $s4, $zero, 8611
+lh $t9, 32($s6)
+
+label212:
+sltiu $t9, $s3, 9167
+sll $k1, $s3, 31
+lb $t4, 20($t8)
+
+label190:
+sltu $gp, $v1, $ra
+and $t2, $t5, $t0
+lhu $a1, 32($s3)
+
+label63:
+lhu $k1, 12($a3)
+lh $s0, 0($s6)
+addi $v0, $t7, 2542
+
+label161:
+sh $v0, 4($zero)
+sw $s2, 4($t2)
+sb $t2, 0($v0)
+
+label353:
+lhu $fp, 24($a3)
+sw $s0, 24($a2)
+add $t0, $t0, $s5
+
+label125:
+xor $a1, $s4, $t7
+srl $t3, $s7, 25
+lw $s1, 16($gp)
+
+label57:
+xori $s4, $a0, 2084
+sh $s3, 4($s1)
+addi $s0, $v0, 10914
+
+label496:
+bne $t9, $t2, label477
+sw $s4, 0($t1)
+sw $sp, 32($s4)
+
+label131:
+add $t4, $k1, $t5
+lw $t3, 20($t4)
+addi $t6, $k1, 7120
+
+label324:
+lw $t3, 4($t2)
+sb $v0, 12($t9)
+lbu $t7, 4($a1)
+
+label291:
+andi $s6, $t2, 14461
+xori $t1, $a1, 12726
+sb $s1, 36($t7)
+
+label407:
+jal label132
+or $sp, $s6, $s6
+sltiu $t6, $k1, 2059
+
+label2:
+slti $t6, $s7, 14593
+sltiu $s4, $ra, 9073
+xori $k0, $a2, 640
+
+label39:
+jal label450
+addi $t2, $s5, 2170
+jal label80
+
+label450:
+or $t2, $s1, $t6
+sll $s5, $s6, 11
+addi $s3, $v1, 9327
+
+label471:
+j label410
+slti $a2, $ra, 3927
+xori $t3, $s5, 2170
+
+label410:
+bne $ra, $fp, label411
+bne $t4, $t3, label42
+ori $t1, $t2, 14837
+
+label392:
+lb $fp, 36($t6)
+sb $a2, 28($t4)
+ori $s4, $ra, 1168
+
+label61:
+srl $sp, $v1, 9
+addi $t3, $k1, 15907
+jal label471
+
+label403:
+slti $t1, $s5, 14634
+ori $t9, $t5, 13606
+jal label271
+
+label84:
+beq $gp, $v1, label444
+lbu $gp, 32($v1)
+nor $t2, $a2, $t5
+
+label358:
+lb $k0, 0($t7)
+jr $v0
+andi $t8, $a3, 3278
+
+label298:
+xor $k1, $t3, $s5
+sh $t0, 36($a0)
+lhu $v0, 12($v0)
+
+label446:
+ori $a0, $k1, 4777
+j label18
+jr $s5
+
+label428:
+srl $fp, $s6, 9
+ori $a3, $t5, 14988
+xori $zero, $s5, 3371
+
+label258:
+srl $a3, $v1, 12
+ori $s2, $sp, 13531
+ori $a0, $k1, 6031
+
+label102:
+sh $t2, 16($s4)
+nor $s1, $s0, $s1
+sh $s4, 4($a2)
+
+label318:
+and $a0, $a1, $t6
+addi $s7, $a3, 11861
+sll $v0, $ra, 26
+
+label452:
+sltu $a3, $ra, $s3
+lb $t0, 36($s3)
+sw $k1, 20($a2)
+
+label494:
+slt $t8, $fp, $t1
+j label312
+sw $t9, 24($a0)
+
+label309:
+addi $s1, $sp, 2146
+lhu $t2, 36($s2)
+jal label174
+
+label246:
+xor $sp, $t1, $k1
+lbu $s4, 20($k0)
+jal label190
+
+label76:
+sh $t4, 28($s7)
+sub $sp, $s2, $fp
+sh $t6, 28($a1)
+
+label341:
+j label490
+j label125
+jr $fp
+
+label431:
+lhu $t2, 20($t0)
+j label146
+addi $v1, $t6, 3184
+
+label299:
+jal label40
+slti $ra, $a3, 6776
+lb $fp, 4($a1)
+
+label456:
+jal label260
+bne $s1, $s7, label319
+slt $s0, $t0, $t1
+
+label460:
+andi $s4, $a0, 15691
+lbu $v0, 20($zero)
+sltiu $k1, $k0, 9322
+
+label146:
+slti $t1, $fp, 1065
+beq $t9, $ra, label329
+sb $t7, 8($s3)
+
+label177:
+sra $s4, $a0, 14
+jal label435
+j label261
+
+label289:
+sw $s1, 36($t3)
+sltiu $t8, $a0, 8248
+jal label494
+
+label64:
+nor $t1, $t1, $t3
+jr $t3
+lw $k0, 16($ra)
+
+label182:
+addi $a3, $s5, 1266
+lbu $t8, 4($ra)
+jr $s1
+
+label395:
+sh $fp, 0($s1)
+j label446
+jal label366
+
+label247:
+xori $s4, $s2, 451
+jal label431
+lhu $a3, 20($gp)
+
+label323:
+j label421
+sltiu $t9, $t6, 14228
+ori $v1, $k1, 5570
+
+label142:
+j label215
+sb $a0, 32($s7)
+lw $t7, 8($t1)
+
+label139:
+jal label156
+srl $a2, $k0, 6
+lb $t4, 32($sp)
+
+label209:
+beq $sp, $v1, label483
+j label216
+jal label496
+
+label375:
+jal label468
+jal label30
+slt $t8, $a0, $s3
+
+label157:
+jal label327
+jal label298
+j label258
+
+label159:
+j label430
+j label142
+jal label337
+
+label444:
+lw $v1, 0($a3)
+sub $ra, $a3, $k1
+jal label177
+
+label33:
+jal label449
+srl $t8, $s5, 25
+j label178
+
+label30:
+sltu $t8, $t4, $s1
+xori $fp, $a3, 9644
+sh $t2, 36($a3)
+
+label174:
+ori $gp, $gp, 7744
+slt $t8, $sp, $s4
+lbu $s5, 4($t7)
+
+label154:
+srl $zero, $s3, 28
+xor $gp, $k1, $t4
+sltiu $t7, $t0, 13567
+
+label294:
+jal label84
+slti $s6, $k0, 4381
+lbu $s6, 20($a2)
+
+label315:
+or $s5, $gp, $v1
+bne $ra, $a0, label111
+xori $t2, $t0, 6601
+
+label130:
+jal label168
+sltiu $s1, $t8, 12781
+sltiu $t2, $a3, 9393
+
+label253:
+xor $k1, $v1, $t1
+j label407
+sra $s7, $v1, 13
+
+label369:
+lh $a3, 12($s0)
+lw $a2, 0($t9)
+sra $gp, $s4, 19
+
+label286:
+xor $t9, $t6, $s1
+or $t6, $k0, $s7
+sltiu $t8, $t2, 10404
+
+label158:
+j label291
+j label32
+lw $a1, 32($a1)
+
+label385:
+sltiu $zero, $t9, 14972
+bne $k1, $t5, label306
+j label321
+
+label230:
+bne $s6, $t4, label233
+slt $t3, $fp, $s0
+sll $a3, $a2, 19
+
+label396:
+jal label455
+lbu $t1, 4($s3)
+jal label395
+
+label329:
+lb $s2, 12($fp)
+nor $s1, $t8, $s5
+xori $t2, $s3, 8221
+
+label490:
+srl $s4, $t1, 22
+sltiu $s1, $v1, 5539
+beq $s5, $v0, label36
+
+label132:
+ori $k1, $t2, 14502
+bne $gp, $s6, label403
+sw $ra, 16($t7)
+
+label199:
+and $zero, $t8, $t1
+and $s0, $t1, $t2
+addu $a2, $t9, $t4
+
+label305:
+lw $s5, 24($a1)
+srl $v1, $a2, 4
+lhu $fp, 28($t7)
+
+label27:
+or $t5, $s7, $s6
+xor $a2, $s1, $s0
+sb $t0, 16($s5)
+
+label312:
+lh $t4, 36($zero)
+add $v0, $v0, $a0
+jal label158
+
+label216:
+slt $t5, $a1, $s1
+j label199
+jal label175
+
+label192:
+lh $ra, 20($s5)
+sltu $fp, $a1, $fp
+or $zero, $t3, $t6
+
+label288:
+xor $t4, $s3, $k0
+j label358
+j label324
+
+label308:
+xori $k1, $t6, 10705
+bne $a3, $a3, label308
+or $t2, $t4, $s5
+
+label56:
+jal label396
+bne $s0, $t4, label65
+lw $fp, 20($ra)
+
+label270:
+beq $s7, $t8, label360
+or $s3, $s6, $s4
+lbu $a2, 12($t9)
+
+label220:
+sh $v0, 0($a2)
+lhu $s3, 36($t3)
+j label349
+
+label337:
+slt $a1, $s3, $t7
+jal label2
+jal label1
+
+label352:
+lh $s4, 0($a1)
+jal label344
+bne $a1, $s3, label173
+
+label430:
+sb $t3, 12($a2)
+nor $a2, $s7, $s4
+j label252
+
+label306:
+add $t9, $k0, $sp
+j label15
+lh $v1, 8($t5)
+
+label156:
+xori $a3, $t6, 3673
+nor $a0, $s3, $t7
+j label161
+
+label360:
+slti $a2, $a1, 3991
+addu $s3, $s2, $k0
+j label86
+
+label86:
+jal label220
+sll $t0, $k1, 19
+sb $t7, 0($t9)
+
+label265:
+beq $a1, $a3, label299
+j label102
+bne $gp, $k0, label212
+
+label321:
+beq $t0, $fp, label404
+lhu $t2, 36($s4)
+sw $s1, 12($a2)
+
+label489:
+sb $t8, 0($v1)
+sw $a3, 28($s1)
+lhu $gp, 24($s7)
+
+label499:
+and $k1, $t6, $s3
+slti $t0, $fp, 13471
+jal label39
+
+label1:
+jal label464
+sb $t3, 8($t1)
+sub $s3, $t7, $s2
+
+label404:
+j label61
+sb $s3, 16($k0)
+addi $v1, $k0, 15574
+
+label264:
+lhu $s2, 12($ra)
+or $v0, $s4, $ra
+srl $a2, $ra, 17
+
+label175:
+sw $s2, 36($t2)
+sll $t4, $sp, 26
+lhu $t4, 4($t8)
+
+label269:
+nor $k1, $t3, $fp
+beq $a0, $zero, label253
+jr $sp
+
+label479:
+sb $ra, 32($t3)
+j label56
+lb $t6, 20($t3)
+
+label36:
+andi $s6, $v0, 6732
+sltiu $s6, $v0, 9384
+slt $v1, $k0, $t7
+
+label173:
+lw $s7, 32($t0)
+j label64
+j label309
+
+label449:
+sltiu $a0, $t4, 12699
+jal label13
+lh $s5, 0($k0)
+
+label178:
+jal label264
+addu $s2, $t5, $s2
+j label119
+
+label366:
+lb $t5, 28($v0)
+add $sp, $fp, $t9
+sh $a0, 16($a2)
+
+label233:
+lbu $t5, 16($s1)
+jal label452
+addi $t1, $zero, 6048
+
+label252:
+lh $ra, 8($k0)
+addu $sp, $gp, $v1
+lbu $zero, 20($s0)
+
+label65:
+ori $k0, $sp, 1654
+sb $t4, 4($k0)
+bne $t8, $a1, label182
+
+label11:
+lw $t4, 32($t8)
+j label11
+lh $t0, 12($s6)
+
+label80:
+sw $t5, 32($t0)
+or $t9, $s5, $t6
+sub $t3, $a1, $t4
+
+label497:
+lbu $t6, 16($gp)
+xor $a1, $s3, $t7
+j label375
+
+label176:
+lh $t0, 12($t1)
+lh $gp, 12($t4)
+j label341
+
+label411:
+j label460
+andi $s6, $s7, 4294
+sw $s2, 36($v1)
+
+label319:
+sw $sp, 36($s4)
+lhu $ra, 32($s0)
+lh $s3, 28($s0)
+
+label344:
+j label385
+andi $sp, $t3, 5808
+lh $t1, 0($t5)
+
+label271:
+add $t0, $t1, $a1
+andi $gp, $sp, 11263
+j label392
+
+label40:
+lh $s7, 16($s2)
+jal label323
+jal label63
+
+label468:
+andi $ra, $gp, 7064
+jal label247
+jal label289
+
+label188:
+sw $t0, 12($t6)
+j label104
+sll $a2, $a1, 19
+
+label417:
+jal label157
+sltu $s3, $s5, $ra
+j label114
+
+label464:
+slt $s3, $s3, $t0
+sub $ra, $t9, $zero
+and $t0, $v0, $v0
+
+label421:
+xori $s1, $s1, 14977
+j label294
+slti $t9, $k0, 11626
+
+label349:
+ori $s5, $s0, 6823
+lbu $t8, 4($s5)
+lb $k0, 32($fp)
+
+label42:
+xor $v0, $s1, $t2
+slti $t9, $zero, 2857
+slt $t8, $a1, $v0
+
+label18:
+slti $t5, $k0, 5999
+ori $t8, $s7, 3135
+srl $t9, $fp, 18
+
+label228:
+andi $s0, $s3, 4884
+sb $s7, 16($ra)
+jal label159
+
+label222:
+addu $t3, $s3, $fp
+slti $a0, $k1, 12387
+sh $v0, 20($s7)
+
+label168:
+jal label270
+lb $s0, 4($a1)
+sll $k0, $s1, 10
+
+label435:
+j label489
+nor $t2, $gp, $v0
+lb $fp, 20($t3)
+
+label273:
+beq $t9, $s4, label273
+j label286
+addu $t8, $zero, $a3
+
+label261:
+addu $a2, $zero, $t6
+addu $s4, $t9, $t4
+j label133
+
+label215:
+j label57
+sll $t5, $s1, 3
+jal label176
+
+label181:
+sltiu $t3, $t7, 8135
+jal label269
+jal label181
+
+label477:
+add $t7, $fp, $t9
+sltu $s6, $s5, $gp
+ori $k0, $t4, 5329
+
+label483:
+lh $t6, 32($v1)
+xor $fp, $s4, $t6
+nor $a2, $gp, $v1
+
+label234:
+lbu $t4, 20($s7)
+lbu $fp, 24($a0)
+sb $s6, 32($t2)
+
+label414:
+slti $s1, $k1, 7256
+jal label499
+sltu $t1, $k0, $t4
+
+label380:
+addi $a1, $t7, 2714
+ori $s6, $s5, 6636
+jal label318
+
+label425:
+nor $s6, $t7, $s6
+ori $k0, $s0, 15483
+addi $t3, $a1, 8669
+
+label98:
+addi $t1, $t1, 2371
+sll $t8, $s2, 31
+jal label27
+
+label371:
+and $v0, $s1, $t9
+sltiu $v1, $s5, 12268
+slt $t3, $k1, $v1
+
+label111:
+srl $a2, $t4, 7
+jal label315
+beq $s2, $a0, label352
+
+label327:
+ori $s3, $gp, 71
+addu $ra, $t0, $v1
+j label131
+
+label104:
+lhu $t6, 8($t6)
+j label371
+jal label380
+
+label13:
+jal label192
+j label305
+jr $t4
+
+label260:
+j label209
+addu $t1, $s0, $s6
+add $s3, $v0, $v0
+
+label32:
+jr $sp
+j label246
+sh $t7, 24($s5)
+
+label455:
+lhu $t9, 12($t2)
+xori $zero, $gp, 9977
+srl $t6, $s6, 1
+srl $a3, $t3, 28
+sh $s3, 4($zero)
+j label265
+jal label288
+beq $v1, $a1, label98
+add $s4, $s6, $t6
+jr $t1
+j label479
+jal label417
+lhu $t8, 32($s7)
+jr $v0
+sltiu $s5, $t1, 13530
+ori $s7, $s6, 13050
+lbu $k0, 24($a1)
+lbu $a3, 16($t7)
+sra $s2, $s5, 30
+lbu $sp, 0($k0)
+bne $t7, $a3, label228
+add $s2, $k0, $s3
+j label230
+j label425
+nor $k0, $t7, $t6
+slt $t7, $a3, $a0
+j label130
+sh $sp, 16($gp)
+beq $sp, $t2, label456
+andi $t5, $t4, 3677
+j label139
+sw $a1, 24($k0)
+beq $v1, $t2, label353
+andi $t4, $t7, 1910
+addu $a0, $a2, $a1
+addu $s4, $a0, $s7
+ori $s5, $gp, 4664
+andi $s1, $s5, 10205
+jal label188
+slti $t4, $gp, 1177
+jal label222
+jal label433
+lhu $s3, 32($k0)
+srl $zero, $s6, 28
+jal label154
+j label428
+lbu $t5, 36($a1)

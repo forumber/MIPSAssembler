@@ -47,7 +47,7 @@ j jal 000011
 
 #registers
 register $zero 00000
-register $at 00001
+#register $at 00001
 register $v0 00010
 register $v1 00011
 register $a0 00100
