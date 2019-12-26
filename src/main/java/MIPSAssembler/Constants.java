@@ -9,6 +9,7 @@ public class Constants {
     public static final String TYPE_J = "j";
     public static final String TYPE_REGISTER = "register";
     public static final String TYPE_MEMORY = "memory";
+    public static final String TYPE_PSEUDO = "pseudo";
     
     public static final String OP_TYPE_RS = "rs";
     public static final String OP_TYPE_RT = "rt";

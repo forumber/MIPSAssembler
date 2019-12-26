@@ -78,3 +78,13 @@ register $gp 11100
 register $sp 11101
 register $fp 11110
 register $ra 11111
+
+#pseudo-likely
+# you can define pseudo instructions here
+# the format;
+# pseudo [instruction name] [variable type]([variable name]),... {(the instruction that converted to);...}
+# !!!WARNING!!!!
+# the application does NOT HANDLE user errors while ONLY parsing PSEUDO instructions
+# so, if you did not define the pseudo instruction correctly or did not write the pseudo instruction correctly while trying to assemble it,
+# applicatin will likely to crash
+pseudo move register(register1),register(register2) {(addu register1, $zero, register2)}

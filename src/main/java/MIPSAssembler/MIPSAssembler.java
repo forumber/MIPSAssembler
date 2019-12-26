@@ -6,10 +6,11 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class MIPSAssembler {
-
+    
     public static Map<String, Map<String, String>> lookUpTable = new HashMap<>();
     public static Map<String, List<String>> permittedOperands = new HashMap<>();
     public static Map<String, Map<String, Integer>> customOperands = new HashMap<>();
+    public static Map<String, PseudoInstruction> pseudoInstructions = new HashMap<>();
     public static Map<String, Integer> labelIndex = new HashMap<>();
     public static Map<String, Long> labelAddress = new HashMap<>();
     public static Scanner consoleInput = new Scanner(System.in);
@@ -62,56 +63,61 @@ public class MIPSAssembler {
 
             // TODO: Change theInstruction variable name
             if (!(nextLine.startsWith("#") || nextLine.isEmpty())) {
-                String[] theInstruction = nextLine.split(" ");
+                if (nextLine.startsWith(Constants.TYPE_PSEUDO)) {
+                    PseudoInstruction temp = new PseudoInstruction(nextLine);
+                    pseudoInstructions.put(temp.instructionName, temp);
+                } else {
+                    String[] theInstruction = nextLine.split(" ");
 
-                if (theInstruction.length == 3 || theInstruction.length == 4) {
-                    if (lookUpTable.containsKey(theInstruction[0])) {
-                        if (lookUpTable.get(theInstruction[0]).containsKey(theInstruction[1]) || lookUpTable.get(theInstruction[0]).containsValue(theInstruction[2])) {
-                            System.err.println("");
-                            System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
-                            System.err.println("Line " + lineCounter + ": The instruction or opcode/function is already being used!");
-                            System.exit(1);
-                        } else {
-                            lookUpTable.get(theInstruction[0]).put(theInstruction[1], theInstruction[2]);
-                            if (theInstruction.length == 4) {
-                                try {
-                                    String[] customOperandsInLookUpTable = theInstruction[3].split(",");
-                                    for (String i : customOperandsInLookUpTable) {
-                                        if (!permittedOperands.get(theInstruction[0]).contains(i)) {
-                                            System.err.println("");
-                                            System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
-                                            System.err.println("Line " + lineCounter + ": The custom operand " + i + " is not allowed for type " + theInstruction[0]);
-                                            System.exit(1);
+                    if (theInstruction.length == 3 || theInstruction.length == 4) {
+                        if (lookUpTable.containsKey(theInstruction[0])) {
+                            if (lookUpTable.get(theInstruction[0]).containsKey(theInstruction[1]) || lookUpTable.get(theInstruction[0]).containsValue(theInstruction[2])) {
+                                System.err.println("");
+                                System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
+                                System.err.println("Line " + lineCounter + ": The instruction or opcode/function is already being used!");
+                                System.exit(1);
+                            } else {
+                                lookUpTable.get(theInstruction[0]).put(theInstruction[1], theInstruction[2]);
+                                if (theInstruction.length == 4) {
+                                    try {
+                                        String[] customOperandsInLookUpTable = theInstruction[3].split(",");
+                                        for (String i : customOperandsInLookUpTable) {
+                                            if (!permittedOperands.get(theInstruction[0]).contains(i)) {
+                                                System.err.println("");
+                                                System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
+                                                System.err.println("Line " + lineCounter + ": The custom operand " + i + " is not allowed for type " + theInstruction[0]);
+                                                System.exit(1);
+                                            }
                                         }
+                                        customOperands.put(theInstruction[1], new HashMap<String, Integer>() {
+                                            {
+                                                put(Constants.OP_TYPE_RD, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_RD) + 1);
+                                                put(Constants.OP_TYPE_RS, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_RS) + 1);
+                                                put(Constants.OP_TYPE_RT, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_RT) + 1);
+                                                put(Constants.OP_TYPE_IMM, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_IMM) + 1);
+                                                put(Constants.OP_TYPE_LABEL, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_LABEL) + 1);
+                                            }
+                                        });
+                                    } catch (Exception e) {
+                                        System.err.println("");
+                                        System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
+                                        System.err.println("Line " + lineCounter + ": Custom operands are not allowed for type: " + theInstruction[0]);
+                                        System.exit(1);
                                     }
-                                    customOperands.put(theInstruction[1], new HashMap<String, Integer>() {
-                                        {
-                                            put(Constants.OP_TYPE_RD, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_RD) + 1);
-                                            put(Constants.OP_TYPE_RS, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_RS) + 1);
-                                            put(Constants.OP_TYPE_RT, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_RT) + 1);
-                                            put(Constants.OP_TYPE_IMM, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_IMM) + 1);
-                                            put(Constants.OP_TYPE_LABEL, Arrays.asList(customOperandsInLookUpTable).indexOf(Constants.OP_TYPE_LABEL) + 1);
-                                        }
-                                    });
-                                } catch (Exception e) {
-                                    System.err.println("");
-                                    System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
-                                    System.err.println("Line " + lineCounter + ": Custom operands are not allowed for type: " + theInstruction[0]);
-                                    System.exit(1);
                                 }
                             }
+                        } else {
+                            System.err.println("");
+                            System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
+                            System.err.println("Line " + lineCounter + ": " + theInstruction[0] + " is not a valid instruction type!");
+                            System.exit(1);
                         }
                     } else {
                         System.err.println("");
                         System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
-                        System.err.println("Line " + lineCounter + ": " + theInstruction[0] + " is not a valid instruction type!");
+                        System.err.println("Line " + lineCounter + ": Entered field is not valid!");
                         System.exit(1);
                     }
-                } else {
-                    System.err.println("");
-                    System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
-                    System.err.println("Line " + lineCounter + ": Entered field is not valid!");
-                    System.exit(1);
                 }
             }
         }
@@ -174,11 +180,27 @@ public class MIPSAssembler {
 
         return toReturn;
     }
+    
+    public static List<String> parseAndAddPseudoInstructions(List<String> instructionsToDecode) {
+        List<String> toReturn = new ArrayList<>();
+        
+        for(String temp: instructionsToDecode) {
+            String[] instrParts = temp.split(" ");
+            
+            if (pseudoInstructions.containsKey(instrParts[0])) {
+                toReturn.addAll(PseudoInstruction.parse(pseudoInstructions.get(instrParts[0]), temp));
+            } else {
+                toReturn.add(temp);
+            }
+        }
+
+        return toReturn;
+    }
 
     public static List<String> assembleBatch(List<String> instructionsToDecode) {
         List<String> instructionsToDecodeWithoutBlanks = removeBlanksAtTheBeginning(instructionsToDecode);
-
-        List<String> labellessInstructionsToDecode = findAllLabelIndexesAndAddresses(instructionsToDecodeWithoutBlanks);
+        List<String> instructionsWithParsedPseudoInstructions = parseAndAddPseudoInstructions(instructionsToDecodeWithoutBlanks);
+        List<String> labellessInstructionsToDecode = findAllLabelIndexesAndAddresses(instructionsWithParsedPseudoInstructions);
         List<String> assembledInstructionsAsBinary = new ArrayList<>();
         int instructionLineCounter = 0;
         long PC = Constants.firstMIPSMemoryLocation;
