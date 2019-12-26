@@ -236,7 +236,7 @@ public class MIPSAssembler {
             System.out.println("");
             System.out.print("Enter name of source file: ");
             inputFileName = consoleInput.nextLine();
-            if (!inputFileName.contains(".src")) {
+            if (!inputFileName.contains(".")) {
                 inputFileName += ".src";
             }
 
@@ -258,7 +258,7 @@ public class MIPSAssembler {
             while (true) {
                 System.out.print("Enter name of output file: ");
                 outputFileName = consoleInput.nextLine();
-                if (!outputFileName.contains(".obj")) {
+                if (!outputFileName.contains(".")) {
                     outputFileName += ".obj";
                 }
 
@@ -296,12 +296,12 @@ public class MIPSAssembler {
         List<String> instructionsToPrint;
 
         System.out.println("");
-        System.out.println("Enter instructions (-1 to start assembling):");
+        System.out.println("Enter instructions (type assemble to start assembling):");
 
         while (true) {
             String theInstructionFromTerminalInput = consoleInput.nextLine();
 
-            if (theInstructionFromTerminalInput.equals("-1")) {
+            if (theInstructionFromTerminalInput.equals("assemble")) {
                 instructionsToPrint = assembleBatch(instructionsToAssemble);
                 break;
             } else {
