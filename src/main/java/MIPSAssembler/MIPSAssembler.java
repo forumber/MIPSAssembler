@@ -13,6 +13,7 @@ public class MIPSAssembler {
     public static Map<String, Integer> labelIndex = new HashMap<>();
     public static Map<String, Long> labelAddress = new HashMap<>();
     public static Scanner consoleInput = new Scanner(System.in);
+    public static boolean isRandomlyGeneratedFileCreated = false;
 
     // TEST
     public static void printLookUpTable() {
@@ -225,6 +226,13 @@ public class MIPSAssembler {
         List<String> instructionsToAssemble = new ArrayList<>();
 
         while (true) {
+            if (isRandomlyGeneratedFileCreated)
+            {
+                System.out.println("");
+                Constants.randomlyGeneratedFileMessage.forEach((theMessage) -> {
+                    System.out.println(theMessage);
+                });
+            }
             System.out.println("");
             System.out.print("Enter name of source file: ");
             inputFileName = consoleInput.nextLine();
@@ -319,6 +327,12 @@ public class MIPSAssembler {
         } catch (FileNotFoundException ex) {
             System.err.println(Constants.lookUpTableFileName + " is not found!");
             System.exit(1);
+        }
+        
+        try {
+            Debug.createRandomSourceFile();
+            isRandomlyGeneratedFileCreated = true;
+        } catch (IOException e) {
         }
 
         while (true) {

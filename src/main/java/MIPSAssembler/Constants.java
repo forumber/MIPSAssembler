@@ -1,5 +1,7 @@
 package MIPSAssembler;
 
+import java.util.*;
+
 public class Constants {
 
     public static final String TYPE_R = "r";
@@ -24,5 +26,11 @@ public class Constants {
     public static final String errorImmediateIsOutOfRangeMessage = "Entered immediate value is out of range!";
     public static final String errorImmediateFieldIsNotValidMessage = "Entered immediate value is not valid!";
     public static final String errorLabelNotFoundMessage = "Entered label is not found in the code!";
+    
+    public static final String randomlyGeneratedFileName = "randomlyGeneratedInput.src";
+    public static final List<String> randomlyGeneratedFileMessage = new ArrayList<String>(){{
+        add("You can use " + Constants.randomlyGeneratedFileName + " if you want");
+        add("The application creates this file on every startup of application with random content in it");
+    }};
 
 }
