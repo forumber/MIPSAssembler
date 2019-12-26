@@ -161,20 +161,23 @@ public class MIPSAssembler {
         List<String> toReturn = new ArrayList<>();
 
         for (String i : stringList) {
-            while (i.startsWith(String.valueOf((char) 32)) || i.startsWith(String.valueOf((char) 9))) {
-                i = i.substring(1);
+            String temp = i;
+            
+            while (temp.startsWith(String.valueOf((char) 32)) || temp.startsWith(String.valueOf((char) 9))) {
+                temp = temp.substring(1);
             }
-
-            toReturn.add(i);
+            
+            if (!temp.isEmpty())
+                toReturn.add(temp);
         }
 
         return toReturn;
     }
 
     public static List<String> assembleBatch(List<String> instructionsToDecode) {
-        instructionsToDecode = removeBlanksAtTheBeginning(instructionsToDecode);
+        List<String> instructionsToDecodeWithoutBlanks = removeBlanksAtTheBeginning(instructionsToDecode);
 
-        List<String> labellessInstructionsToDecode = findAllLabelIndexes(instructionsToDecode);
+        List<String> labellessInstructionsToDecode = findAllLabelIndexes(instructionsToDecodeWithoutBlanks);
         List<String> assembledInstructionsAsBinary = new ArrayList<>();
         int instructionLineCounter = 0;
         long PC = Constants.firstMIPSMemoryLocation;
@@ -509,11 +512,11 @@ public class MIPSAssembler {
         List<String> temp = new ArrayList<>();
         for (String instr : instructionsToDecode) {
             if (instr.endsWith(":")) {
-                long theLabelAddress = Constants.firstMIPSMemoryLocation + (4 * instrLineCounter);
+                long theLabelAddress = Constants.firstMIPSMemoryLocation + ((long)4 * (long)instrLineCounter);
                 labelIndex.put(instr.replace(":", ""), instrLineCounter);
                 labelAddress.put(instr.replace(":", ""), theLabelAddress);
             } else if (instr.contains(":")) {
-                long theLabelAddress = Constants.firstMIPSMemoryLocation + (4 * instrLineCounter);
+                long theLabelAddress = Constants.firstMIPSMemoryLocation + ((long)4 * (long)instrLineCounter);
                 labelIndex.put(instr.substring(0, instr.indexOf(":")), instrLineCounter);
                 labelAddress.put(instr.substring(0, instr.indexOf(":")), theLabelAddress);
 
