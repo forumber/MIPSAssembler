@@ -178,7 +178,7 @@ public class MIPSAssembler {
     public static List<String> assembleBatch(List<String> instructionsToDecode) {
         List<String> instructionsToDecodeWithoutBlanks = removeBlanksAtTheBeginning(instructionsToDecode);
 
-        List<String> labellessInstructionsToDecode = findAllLabelIndexes(instructionsToDecodeWithoutBlanks);
+        List<String> labellessInstructionsToDecode = findAllLabelIndexesAndAddresses(instructionsToDecodeWithoutBlanks);
         List<String> assembledInstructionsAsBinary = new ArrayList<>();
         int instructionLineCounter = 0;
         long PC = Constants.firstMIPSMemoryLocation;
@@ -520,8 +520,9 @@ public class MIPSAssembler {
         return bin32instr;
     }
 
-    public static List<String> findAllLabelIndexes(List<String> instructionsToDecode) {
+    public static List<String> findAllLabelIndexesAndAddresses(List<String> instructionsToDecode) {
         labelIndex.clear();
+        labelAddress.clear();
         int instrLineCounter = 0;
         List<String> temp = new ArrayList<>();
         for (String instr : instructionsToDecode) {
