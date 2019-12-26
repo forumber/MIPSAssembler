@@ -338,7 +338,7 @@ public class MIPSAssembler {
         while (true) {
             System.out.println("");
             System.out.println("Java MIPS Assembler");
-            System.out.print("(I)nteraction mode / (B)atch mode: ");
+            System.out.print("(I)nteraction mode / (B)atch mode / (E)xit: ");
 
             answer = consoleInput.nextLine();
 
@@ -346,6 +346,8 @@ public class MIPSAssembler {
                 batchMode();
             } else if (answer.equalsIgnoreCase("i")) {
                 interactiveMode();
+            } else if (answer.equalsIgnoreCase("e")) {
+                System.exit(0);
             } else {
                 System.out.println("Wrong input!");
             }
