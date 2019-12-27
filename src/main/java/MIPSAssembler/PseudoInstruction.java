@@ -2,14 +2,36 @@ package MIPSAssembler;
 
 import java.util.*;
 
-public final class PseudoInstruction {
+public class PseudoInstruction {
 
     public String instructionName;
     private Map<String, String> operandsAndTypes;
     private List<String> translatedOperations;
 
     public PseudoInstruction(String lookUpTableLine) {
-        parsePseudoInstruction(lookUpTableLine);
+        if (isItSafeToParse(lookUpTableLine))
+            parsePseudoInstruction(lookUpTableLine);
+        else
+            throw new IllegalArgumentException("Pseudo line is not valid!");
+    }
+    
+    private boolean isItSafeToParse(String lookUpTableLine) {
+        if (!(lookUpTableLine.contains(" {") && lookUpTableLine.contains("}")))
+            return false;
+        
+        if (!BalancedParan.areParenthesisBalanced(lookUpTableLine.toCharArray()))
+            return false;
+        
+        if (!lookUpTableLine.endsWith("}"))
+            return false;
+        
+        String translationPart = lookUpTableLine.substring(lookUpTableLine.indexOf("{"));
+        String[] leftParts = lookUpTableLine.substring(0, lookUpTableLine.indexOf(" {")).split(" ");
+        
+        if (leftParts.length != 3)
+            return false;
+        
+        return true;
     }
 
     public void parsePseudoInstruction(String lookUpTableLine) {
