@@ -298,6 +298,8 @@ public class MIPSAssembler {
         while (inputFile.hasNextLine()) {
             instructionsToAssemble.add(inputFile.nextLine());
         }
+        
+        inputFile.close();
 
         instructionsToWrite = assembleBatch(instructionsToAssemble);
 
