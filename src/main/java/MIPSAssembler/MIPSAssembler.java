@@ -191,7 +191,7 @@ public class MIPSAssembler {
 
     }
 
-    public static List<String> removeBlanksAtTheBeginning(List<String> stringList) {
+    public static List<String> removeBlanksAndComments(List<String> stringList) {
         List<String> toReturn = new ArrayList<>();
 
         for (String i : stringList) {
@@ -225,7 +225,7 @@ public class MIPSAssembler {
     }
 
     public static List<String> assembleBatch(List<String> instructionsToDecode) {
-        List<String> instructionsToDecodeWithoutBlanks = removeBlanksAtTheBeginning(instructionsToDecode);
+        List<String> instructionsToDecodeWithoutBlanks = removeBlanksAndComments(instructionsToDecode);
         List<String> instructionsWithParsedPseudoInstructions = parseAndAddPseudoInstructions(instructionsToDecodeWithoutBlanks);
         List<String> labellessInstructionsToDecode = findAllLabelIndexesAndAddresses(instructionsWithParsedPseudoInstructions);
         List<String> assembledInstructionsAsBinary = new ArrayList<>();
