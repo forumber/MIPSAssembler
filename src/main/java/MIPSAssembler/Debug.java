@@ -135,7 +135,7 @@ public class Debug {
                                         builtString += availableRegisters[rand.nextInt(availableRegisters.length)];
                                         break;
                                     case Constants.OP_TYPE_IMM:
-                                        builtString += String.valueOf(rand.nextInt(32));
+                                        builtString += String.valueOf(rand.nextInt(15));
                                         break;
                                     default:
                                         break;
