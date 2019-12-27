@@ -237,7 +237,14 @@ public class MIPSAssembler {
                 if (assembledInstruction.startsWith(Constants.errorTag)) {
                     System.err.println("");
                     System.err.println("An error has occurred while assembling the instruction");
-                    System.err.println("Line " + (instructionsToDecode.indexOf(i) + 1) + ": " + assembledInstruction.replace(Constants.errorTag, ""));
+                    int lineNumber = 0;
+                    for (int currLine = 0; currLine < instructionsToDecode.size(); currLine++) {
+                        if (instructionsToDecode.get(currLine).contains(i)) {
+                            lineNumber = currLine;
+                            break;
+                        }
+                    }
+                    System.err.println("Line " + (lineNumber + 1) + ": " + assembledInstruction.replace(Constants.errorTag, ""));
                     return null;
                 } else {
                     assembledInstructionsAsBinary.add(assembledInstruction);
