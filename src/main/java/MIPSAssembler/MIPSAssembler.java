@@ -124,7 +124,7 @@ public class MIPSAssembler {
         lookUpTableFile.close();
     }
 
-    public static String assemble(String instructionToDecode, int currentInstrLine, long PC) {
+    public static String assemble(String instructionToDecode, int currentInstrLine) {
 
         String instructionToDecodeType = "";
 
@@ -203,12 +203,10 @@ public class MIPSAssembler {
         List<String> labellessInstructionsToDecode = findAllLabelIndexesAndAddresses(instructionsWithParsedPseudoInstructions);
         List<String> assembledInstructionsAsBinary = new ArrayList<>();
         int instructionLineCounter = 0;
-        long PC = Constants.firstMIPSMemoryLocation;
         for (String i : labellessInstructionsToDecode) {
             if (!i.isEmpty()) {
-                String assembledInstruction = assemble(i, instructionLineCounter, PC);
+                String assembledInstruction = assemble(i, instructionLineCounter);
                 instructionLineCounter++;
-                PC += 4;
                 if (assembledInstruction.startsWith(Constants.errorTag)) {
                     System.err.println("");
                     System.err.println("An error has occurred while assembling the instruction");
