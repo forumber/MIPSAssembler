@@ -174,7 +174,7 @@ public class MIPSAssembler {
                 temp = temp.substring(1);
             }
             
-            if (!temp.isEmpty())
+            if (!temp.isEmpty() && !temp.startsWith("#"))
                 toReturn.add(temp);
         }
 
@@ -432,6 +432,9 @@ public class MIPSAssembler {
         }
 
         if (operandDecodeOrder.get(Constants.OP_TYPE_IMM) != 0) {
+            if (Long.valueOf(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_IMM)]) > 32767 || Long.valueOf(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_IMM)]) < -32767)
+                return Constants.errorTag + Constants.errorImmediateIsOutOfRangeMessage;
+            
             try {
                 immediateField = Integer.toBinaryString(Integer.valueOf(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_IMM)])); // imm
             } catch (NumberFormatException ex) {
@@ -445,8 +448,8 @@ public class MIPSAssembler {
             }
         }
 
-        if (immediateField.length() > 16 && operandDecodeOrder.get(Constants.OP_TYPE_IMM) != 0) {
-            return Constants.errorTag + Constants.errorImmediateIsOutOfRangeMessage;
+        if (immediateField.length() == 32 && operandDecodeOrder.get(Constants.OP_TYPE_IMM) != 0) {
+            immediateField = immediateField.substring(16);
         }
 
         if (immediateField.length() > 16 && operandDecodeOrder.get(Constants.OP_TYPE_LABEL) != 0) {
@@ -519,6 +522,9 @@ public class MIPSAssembler {
         }
 
         if (operandDecodeOrder.get(Constants.OP_TYPE_IMM) != 0) {
+            if (Long.valueOf(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_IMM)]) > 15 || Long.valueOf(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_IMM)]) < -15)
+                return Constants.errorTag + Constants.errorImmediateIsOutOfRangeMessage;
+            
             try {
                 shiftAmount = Integer.toBinaryString(Integer.valueOf(instrParts[operandDecodeOrder.get(Constants.OP_TYPE_IMM)])); // imm
             } catch (NumberFormatException ex) {
@@ -526,8 +532,8 @@ public class MIPSAssembler {
             }
         }
 
-        if (shiftAmount.length() > 5) {
-            return Constants.errorTag + Constants.errorImmediateIsOutOfRangeMessage;
+        if (shiftAmount.length() == 32) {
+            shiftAmount = shiftAmount.substring(27);
         }
 
         String oldString = "";
