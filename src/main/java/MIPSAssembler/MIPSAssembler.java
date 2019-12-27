@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 public class MIPSAssembler {
     
+    public static long firstMIPSMemoryLocation = 0x0L;
     public static Map<String, Map<String, String>> lookUpTable = new HashMap<>();
     public static Map<String, List<String>> permittedOperands = new HashMap<>();
     public static Map<String, Map<String, Integer>> customOperands = new HashMap<>();
@@ -63,7 +64,26 @@ public class MIPSAssembler {
 
             // TODO: Change theInstruction variable name
             if (!(nextLine.startsWith("#") || nextLine.isEmpty())) {
-                if (nextLine.startsWith(Constants.TYPE_PSEUDO)) {
+                if (nextLine.startsWith(Constants.TYPE_FIRSTMIPSMEMORYLOCATION)) {
+                    String[] memoryParts = nextLine.split(" ");
+
+                    if (memoryParts.length == 2) {
+                        try {
+                            long test = Long.decode(memoryParts[1]);
+                            firstMIPSMemoryLocation = Long.decode(memoryParts[1]);
+                        } catch (NumberFormatException e) {
+                            System.err.println("");
+                            System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
+                            System.err.println("Line " + lineCounter + ": Please enter a valid hex variable for first MIPS memory location!");
+                            System.exit(1);
+                        }
+                    } else {
+                        System.err.println("");
+                        System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
+                        System.err.println("Line " + lineCounter + ": Please enter a valid hex variable for first MIPS memory location!");
+                        System.exit(1);
+                    }
+                } else if (nextLine.startsWith(Constants.TYPE_PSEUDO)) {
                     PseudoInstruction temp = new PseudoInstruction(nextLine);
                     pseudoInstructions.put(temp.instructionName, temp);
                 } else {
@@ -121,6 +141,13 @@ public class MIPSAssembler {
                 }
             }
         }
+        if (firstMIPSMemoryLocation == 0x0L) {
+            System.err.println("");
+            System.err.println("An error has occurred while reading " + Constants.lookUpTableFileName);
+            System.err.println("Please enter a valid " + Constants.TYPE_FIRSTMIPSMEMORYLOCATION + " value to " + Constants.TYPE_FIRSTMIPSMEMORYLOCATION + "!");
+            System.exit(1);
+        }
+        
         lookUpTableFile.close();
     }
 
@@ -338,42 +365,6 @@ public class MIPSAssembler {
         }
     }
 
-    public static void main(String[] args) {
-        //System.out.println("First MIPS Memory Location is 0x" + Long.toHexString(firstMIPSMemoryLocation));
-        String answer;
-
-        try {
-            fillLookUpTable();
-        } catch (FileNotFoundException ex) {
-            System.err.println(Constants.lookUpTableFileName + " is not found!");
-            System.exit(1);
-        }
-        
-        try {
-            Debug.createRandomSourceFile();
-            isRandomlyGeneratedFileCreated = true;
-        } catch (IOException e) {
-        }
-
-        while (true) {
-            System.out.println("");
-            System.out.println("Java MIPS Assembler");
-            System.out.print("(I)nteraction mode / (B)atch mode / (E)xit: ");
-
-            answer = consoleInput.nextLine();
-
-            if (answer.equalsIgnoreCase("b")) {
-                batchMode();
-            } else if (answer.equalsIgnoreCase("i")) {
-                interactiveMode();
-            } else if (answer.equalsIgnoreCase("e")) {
-                System.exit(0);
-            } else {
-                System.out.println("Wrong input!");
-            }
-        }
-    }
-
     public static String registerDecode(String registerToDecode) {
         if (registerToDecode.startsWith("$")) {
             if (lookUpTable.get(Constants.TYPE_REGISTER).containsKey(registerToDecode)) {
@@ -555,11 +546,11 @@ public class MIPSAssembler {
         List<String> temp = new ArrayList<>();
         for (String instr : instructionsToDecode) {
             if (instr.endsWith(":")) {
-                long theLabelAddress = Constants.firstMIPSMemoryLocation + ((long)4 * (long)instrLineCounter);
+                long theLabelAddress = firstMIPSMemoryLocation + ((long)4 * (long)instrLineCounter);
                 labelIndex.put(instr.replace(":", ""), instrLineCounter);
                 labelAddress.put(instr.replace(":", ""), theLabelAddress);
             } else if (instr.contains(":")) {
-                long theLabelAddress = Constants.firstMIPSMemoryLocation + ((long)4 * (long)instrLineCounter);
+                long theLabelAddress = firstMIPSMemoryLocation + ((long)4 * (long)instrLineCounter);
                 labelIndex.put(instr.substring(0, instr.indexOf(":")), instrLineCounter);
                 labelAddress.put(instr.substring(0, instr.indexOf(":")), theLabelAddress);
 
@@ -618,5 +609,40 @@ public class MIPSAssembler {
                 + immediateField;
 
     }
+    
+    public static void main(String[] args) {
+        String answer;
+
+        try {
+            fillLookUpTable();
+        } catch (FileNotFoundException ex) {
+            System.err.println(Constants.lookUpTableFileName + " is not found!");
+            System.exit(1);
+        }
+        
+        try {
+            Debug.createRandomSourceFile();
+            isRandomlyGeneratedFileCreated = true;
+        } catch (IOException e) {
+        }
+
+        while (true) {
+            System.out.println("");
+            System.out.println("Java MIPS Assembler");
+            System.out.print("(I)nteraction mode / (B)atch mode / (E)xit: ");
+
+            answer = consoleInput.nextLine();
+
+            if (answer.equalsIgnoreCase("b")) {
+                batchMode();
+            } else if (answer.equalsIgnoreCase("i")) {
+                interactiveMode();
+            } else if (answer.equalsIgnoreCase("e")) {
+                System.exit(0);
+            } else {
+                System.out.println("Wrong input!");
+            }
+        }
+    }    
 
 }

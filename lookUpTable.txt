@@ -1,3 +1,5 @@
+firstMIPSMemoryLocation 0x80001000
+
 #R type
 # default operand format order:
 # rd,rs,rt
