@@ -1,4 +1,4 @@
-firstMIPSMemoryLocation 0x80001000
+firstMIPSMemoryLocation 0x00400024
 
 #R type
 # default operand format order:
